@@ -4,6 +4,7 @@ import "./globals.css";
 import { Avatar} from "@/components/ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import NavBar from "@/components/program/nav-bar";
+import Banner from "@/components/program/banners";
 
 const tiltNeon = Tilt_Neon({
   variable: "--font-tilt-neon",
@@ -55,6 +56,8 @@ export default function RootLayout({
             </div>
 
           </nav>
+
+          <Banner/>
         {children}
         </main>
       </body>
