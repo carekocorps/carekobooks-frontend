@@ -1,16 +1,20 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Tilt_Neon, Tilt_Warp } from "next/font/google";
+import { Input } from "@/components/ui/input"
 import "./globals.css";
+import { Avatar} from "@/components/ui/avatar";
+import { AvatarImage } from "@radix-ui/react-avatar";
+import NavBar from "@/components/program/nav-bar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const tiltNeon = Tilt_Neon({
+  variable: "--font-tilt-neon",
   subsets: ["latin"],
+  weight: ["400"], 
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const tiltWarp = Tilt_Warp({
   subsets: ["latin"],
+  weight: ["400"],
 });
-
 
 export default function RootLayout({
   children,
@@ -19,10 +23,40 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${tiltNeon.variable} antialiased`}>
+        <main className="bg-[#F5F3FE] min-h-screen flex flex-col items-center">
+          <nav className="w-full h-25 bg-black 
+          bg-gradient-to-r fro2-[#12193D] to-[#2B43A3]
+          flex items-center justify-between px-20"
+          >
+            <div className="flex flex-col text-white font-bold">
+              <h1 className={`text-3xl ${tiltWarp.className}`}>CarekoBooks</h1>
+              <p className="text-sm">Leia, Registre e Compartilhe</p>
+            </div>
+
+            <NavBar />
+            
+            <div className="flex items-center justify-center gap-4">
+              <div>
+                <Input
+                  type="search"
+                  placeholder="Buscar livros..." 
+                  className="bg-zinc-200"
+                />
+              </div>
+
+              <Avatar className="w-12 h-12">
+                <AvatarImage
+                  src="/image.png"
+                  alt="Imagem de avatar"
+                  className="object-cover w-full h-full"
+                />
+              </Avatar>
+            </div>
+
+          </nav>
         {children}
+        </main>
       </body>
     </html>
   );
