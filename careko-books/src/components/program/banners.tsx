@@ -9,7 +9,7 @@ import Image from "next/image"
 
   export default function Banner(){
     return(
-      <Carousel className="w-350 y- mt-4">
+      <Carousel>
         <CarouselContent>
           <CarouselItem className="my-0 mx-auto ">
             <div className="relative w-full h-64">
