@@ -1,6 +1,7 @@
 import Banner from "@/components/program/banners";
 import Book from "@/components/program/book";
 import Activity from "@/components/program/activity";
+import { Separator } from "@/components/ui/separator";
 
 export default function Home() {
   return (
@@ -8,8 +9,9 @@ export default function Home() {
           <Banner/>
 
           <div className="flex gap-40">
-            <div className="flex flex-col gap-7">
-              <h1 className="text-2xl text-[#2E2E2E]">Pouplar na sua rede</h1>
+            <div className="flex flex-col gap-4">
+              <h1 className="text-2xl text-[#2E2E2E]">Popular na sua rede</h1>
+              <Separator orientation="horizontal" className="h-px bg-gray-300"/>
             
               <div className="flex gap-6 justify-start w-full ">
                 <Book image="/metamorfose.png" name="A Metamorfose"/>
@@ -19,6 +21,7 @@ export default function Home() {
               </div>
 
               <h1 className="text-2xl text-[#2E2E2E]">Continue Lendo</h1>
+              <Separator orientation="horizontal" className="h-px bg-gray-300"/>
        
 
                 <div className="flex gap-6 justify-start w-full ">
@@ -26,6 +29,7 @@ export default function Home() {
                 </div>
 
               <h1 className="text-2xl text-[#2E2E2E]">Livros mais recentes</h1>
+              <Separator orientation="horizontal" className="h-px bg-gray-300"/>
 
                 <div className="flex gap-6 justify-start w-full ">
                   <Book image="/metamorfose.png" name="A Metamorfose"/>
@@ -34,6 +38,13 @@ export default function Home() {
                   <Book image="/rezende.png" name="Dois Mundos, Um Herói"/>
                 </div>
             </div>
+
+            <div className="flex flex-col gap-4 border-3 rounded-xl">
+            <h1 className="text-2xl text-white bg-[#1e3283] p-3 rounded-xl flex items-center justify-between">
+              Atividade
+              <i className="bi-people-fill text-white text-xl" />
+              </h1>
+            <Separator orientation="horizontal" className="h-px bg-gray-300"/>
               <div className="flex flex-col gap-5">
                   <Activity username="@Amanda" livro="É Assim que Acaba" horario="12:00"/>
                   <Activity username="@nayetdet" livro="Diário de um Banana" horario="17:00"/>
@@ -41,6 +52,7 @@ export default function Home() {
                   <Activity username="@Amanda" livro="É assim que acaba" horario="14:30"/>
                   <Activity username="@Amanda" livro="É assim que acaba" horario="12:00"/>
               </div>
+            </div>
           </div>
           </section>
   );

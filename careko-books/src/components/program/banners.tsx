@@ -24,7 +24,7 @@ import Image from "next/image"
           <CarouselItem>
             <div className="relative w-full h-64">
               <Image
-                src="/distopia.png"
+                src="/ad.png"
                 alt="Banner chamativo"
                 fill
                 className="object-cover rounded-lg"
