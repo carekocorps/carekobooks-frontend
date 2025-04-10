@@ -7,14 +7,19 @@ import {
   } from "@/components/ui/carousel"
 import Image from "next/image"
 
-  export default function Banner(){
+type BannerProps = {
+  image1: string
+  image2: string
+}
+
+  export default function Banner({image1, image2}:BannerProps){
     return(
       <Carousel>
         <CarouselContent>
           <CarouselItem className="my-0 mx-auto ">
             <div className="relative w-full h-64">
               <Image
-                src="/distopia.png"
+                src={image1}
                 alt="Banner chamativo"
                 fill
                 className="object-cover rounded-lg"
@@ -24,7 +29,7 @@ import Image from "next/image"
           <CarouselItem>
             <div className="relative w-full h-64">
               <Image
-                src="/ad.png"
+                src={image2}
                 alt="Banner chamativo"
                 fill
                 className="object-cover rounded-lg"

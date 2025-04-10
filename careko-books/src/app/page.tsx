@@ -6,7 +6,10 @@ import { Separator } from "@/components/ui/separator";
 export default function Home() {
   return (
     <section className="flex flex-col w-350 y- mt-4 gap-15">
-          <Banner/>
+          <Banner
+          image1="/distopia.png"
+          image2="/ad.png"
+          />
 
           <div className="flex gap-40">
             <div className="flex flex-col gap-4">
@@ -38,7 +41,7 @@ export default function Home() {
                 <i className="bi bi-bookmarks-fill"></i>
                 Livros mais recentes
                 </h1>
-              <Separator orientation="horizontal" className="h-px bg-gray-300"/>
+                <Separator orientation="horizontal" className="h-px bg-gray-300"/>
 
                 <div className="flex gap-6 justify-start w-full ">
                   <Book image="/metamorfose.png" name="A Metamorfose"/>
