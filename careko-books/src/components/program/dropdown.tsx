@@ -18,7 +18,7 @@ import {
           {children}
         </DropdownMenuTrigger>
   
-        <DropdownMenuContent className="w-56 p-2 text-base"> {/* Aumenta largura e texto */}
+        <DropdownMenuContent className="w-56 p-2 text-base mr-20"> {/* Aumenta largura e texto */}
           <DropdownMenuLabel className="text-gray-700 text-sm">Minha Conta</DropdownMenuLabel>
           <DropdownMenuSeparator />
   

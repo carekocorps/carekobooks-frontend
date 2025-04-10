@@ -27,7 +27,7 @@ export default function RootLayout({
       <body className={`${tiltNeon.variable} antialiased`}>
         <main className="bg-[#F5F3FE] min-h-screen flex flex-col items-center">
           <nav className="w-full h-25 bg-black 
-          bg-gradient-to-r fro2-[#12193D] to-[#2B43A3]
+          bg-gradient-to-r from-[#0f2027] via-[#203a43] to-[#2c5364]
           flex items-center justify-between px-20"
           >
             <div className="flex flex-col text-white font-bold">
@@ -38,24 +38,28 @@ export default function RootLayout({
             <NavBar />
             
             <div className="flex items-center justify-center gap-4">
-              <div>
+              <div className="bg-white/40 rounded-md">
                 <Input
                   type="search"
                   placeholder="Buscar livros..." 
-                  className="bg-zinc-200"
+                  className="text-white placeholder:text-white/70 bg-transparent"
                 />
               </div>
 
-              <Avatar className="w-12 h-12">
-                <AvatarImage
-                  src="/image.png"
-                  alt="Imagem de avatar"
-                  className="object-cover w-full h-full"
-                />
-              </Avatar>
 
-              <Dropdown>
-                <i className="bi bi-caret-down-fill text-white cursor-pointer"></i>
+              <Dropdown >
+                <div className="flex items-center justify-center gap-3 cursor-pointer">
+
+                <Avatar className="w-12 h-12">
+                  <AvatarImage
+                    src="/image.png"
+                    alt="Imagem de avatar"
+                    className="object-cover w-full h-full"
+                  />
+                </Avatar>
+
+                <i className="bi bi-chevron-down text-white"></i>
+                </div>
               </Dropdown>
             </div>
 
