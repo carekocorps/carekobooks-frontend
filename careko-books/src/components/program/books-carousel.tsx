@@ -14,7 +14,7 @@ import {
   export default function CarouselBooks({ books }: CarouselBooksProps) {
     return (
       <Carousel>
-        <CarouselContent className="-ml-4">
+        <CarouselContent className="ml-2 h-80 mt-2">
           {books.map((book, index) => (
             <CarouselItem key={index} className="pl-4 basis-auto">
               {book}
