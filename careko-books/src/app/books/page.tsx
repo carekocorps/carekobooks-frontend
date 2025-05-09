@@ -1,32 +1,16 @@
 'use client';
 
-import React from 'react'
 import FilterBar from '@/components/program/filter-bar';
-import { useSearchParams } from 'next/navigation'
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import CarouselBooks from "@/components/program/books-carousel";
-import Book from "@/components/program/book";
 import { PaginationDemo } from '@/components/program/pagination-demo';
-
-type BookItem = {
-  id: string;
-  image: string;
-  name: string;
-};
+import Book from '@/components/program/book';
+import { useQueries } from '@/hooks/useQueries';
+import CarouselBooks from '@/components/program/books-carousel';
+import { SkeletonCard } from '@/components/program/skeleton-card';
 
 export default function SearchResultsPage() {
-  const searchParams = useSearchParams();
-  const searchQuery = searchParams.get('search');
-
-  const booksData: BookItem[] = [
-    { id: "1", image: "/booksMock/metamorfose.png", name: "A Metamorfose" },
-    { id: "2", image: "/image.png", name: "Biriba" },
-    { id: "3", image: "/booksMock/larissa.png", name: "O Diário de Larissa Manoela" },
-    { id: "4", image: "/booksMock/rezende.png", name: "Dois Mundos, Um Herói" },
-    { id: "5", image: "/booksMock/assim.png", name: "É Assim que Acaba" },
-    { id: "6", image: "/booksMock/sapiens.png", name: "Sapiens" },
-  ];
+  const { books, loading, searchQuery } = useQueries();
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -43,7 +27,7 @@ export default function SearchResultsPage() {
                   Exibindo resultados para: <span className="text-primary">{searchQuery}</span>
                 </h1>
               )}
-              <p className="text-muted-foreground">1 de 35</p>
+              <p className="text-muted-foreground">{books.length} resultados encontrados</p>
             </div>
             
             <nav>
@@ -62,29 +46,26 @@ export default function SearchResultsPage() {
             </nav>
             
           </header>
-          
-          <article>
-            <h2 className="sr-only">Livros encontrados</h2>
-            <CarouselBooks
-              books={booksData.map(book => (
-                <Book 
-                  key={book.id} 
-                  image={book.image} 
-                  name={book.name} 
-                />
+
+          {loading ? (
+             <CarouselBooks
+                books={[...Array(3)].map((_, index) => (
+                <SkeletonCard key={index} />
               ))}
-            />
-            <h2 className="sr-only">Livros encontrados</h2>
-            <CarouselBooks
-              books={booksData.map(book => (
-                <Book 
-                  key={book.id} 
-                  image={book.image} 
-                  name={book.name} 
-                />
-              ))}
-            />
-          </article>
+              />
+          ) : books.length === 0 ? (
+            <p>Nenhum livro encontrado.</p>
+          ) : (
+            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
+              {books.map(book => {
+                return (
+                  <div key={book.id}>
+                    <Book bookItem={book}/>
+                  </div>
+                )
+              })}
+            </ul>
+          )}
 
           <PaginationDemo />
         </section>

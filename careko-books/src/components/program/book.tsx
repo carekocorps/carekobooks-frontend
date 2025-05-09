@@ -1,11 +1,9 @@
+import { BookType } from "@/types/book";
 import Image from "next/image";
 
-type BookProps = {
-    image: string;
-    name: string;
-  };
 
-  export default function Book({ image, name }: BookProps) {
+  export default function Book(bookProps: {bookItem: BookType}) {
+    const { bookItem } = bookProps
     return (
       <div
         className="flex flex-col items-center justify-start gap-2 w-40 
@@ -15,7 +13,7 @@ type BookProps = {
       >
         <div className="relative w-40 h-60 shadow-md">
           <Image
-            src={image}
+            src={`https://${bookItem.image.url}`}
             alt="Capa de Livro"
             fill
             className="object-cover rounded-t-md"
@@ -23,7 +21,7 @@ type BookProps = {
         </div>
   
         <h2 className="w-full h-10 text-sm text-center line-clamp-2">
-          {name}
+          {bookItem.title}
         </h2>
       </div>
     );
