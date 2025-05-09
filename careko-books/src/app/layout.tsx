@@ -1,10 +1,10 @@
 import { Tilt_Neon, Tilt_Warp } from "next/font/google";
-import { Input } from "@/components/ui/input"
 import "./globals.css";
 import { Avatar} from "@/components/ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import NavBar from "@/components/program/nav-bar";
 import Dropdown from "@/components/program/dropdown";
+import SearchBar from "@/components/program/search-bar";
 
 const tiltNeon = Tilt_Neon({
   variable: "--font-tilt-neon",
@@ -38,11 +38,7 @@ export default function RootLayout({
             <NavBar />
             
             <div className="flex items-center justify-center gap-4">
-                <Input
-                  type="search"
-                  placeholder="Buscar livros..." 
-                  className="text-white placeholder:text-white/70 bg-white/40 rounded-md"
-                />
+              <SearchBar/>
 
               <Dropdown >
                 <div className="flex items-center justify-center gap-3 cursor-pointer">
