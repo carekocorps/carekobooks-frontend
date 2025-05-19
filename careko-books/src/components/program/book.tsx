@@ -13,7 +13,7 @@ import Image from "next/image";
       >
         <div className="relative w-40 h-60 shadow-md">
           <Image
-            src={`https://${bookItem.image.url}`}
+            src={bookItem.image.url}
             alt="Capa de Livro"
             fill
             className="object-cover rounded-t-md"

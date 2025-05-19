@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "s3.fanclub-bbb.shop",
+        hostname: "s3.carekobooks.space",
         pathname: "/images/**", 
       },
     ],
