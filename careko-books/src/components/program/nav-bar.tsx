@@ -27,7 +27,7 @@ export default function NavBar(){
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <Link href="/seus-livros" passHref>
+          <Link href="/user/profile" passHref>
             <NavigationMenuLink className="px-4 py-2 text-l">
               Seus Livros
             </NavigationMenuLink>
