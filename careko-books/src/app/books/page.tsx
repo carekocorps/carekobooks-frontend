@@ -8,9 +8,10 @@ import Book from '@/components/program/book';
 import { useQueries } from '@/hooks/useQueries';
 import CarouselBooks from '@/components/program/books-carousel';
 import { SkeletonCard } from '@/components/program/skeleton-card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function SearchResultsPage() {
-  const { books, loading, searchQuery } = useQueries();
+  const { books, loading, searchQuery, totalPages } = useQueries();
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -41,8 +42,20 @@ export default function SearchResultsPage() {
                     <RadioGroupItem value="user" id="r2" />
                     <Label htmlFor="r2">Usuários</Label>
                   </div>
+
+                  <Select>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Ordenar Por" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Username">Username</SelectItem>
+                    <SelectItem value="Score">Score</SelectItem>
+                    <SelectItem value="Data">Data</SelectItem>
+                  </SelectContent>
+                </Select>
                 </div>
               </RadioGroup>
+
             </nav>
             
           </header>
@@ -56,7 +69,7 @@ export default function SearchResultsPage() {
           ) : books.length === 0 ? (
             <p>Nenhum livro encontrado.</p>
           ) : (
-            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
+            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-1">
               {books.map(book => {
                 return (
                   <div key={book.id}>
@@ -67,7 +80,7 @@ export default function SearchResultsPage() {
             </ul>
           )}
 
-          <PaginationDemo />
+          <PaginationDemo totalPages={totalPages}/>
         </section>
       </div>
     </main>

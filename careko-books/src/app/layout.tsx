@@ -5,6 +5,7 @@ import { AvatarImage } from "@radix-ui/react-avatar";
 import NavBar from "@/components/program/nav-bar";
 import Dropdown from "@/components/program/dropdown";
 import SearchBar from "@/components/program/search-bar";
+import {NuqsAdapter} from "nuqs/adapters/next"
 
 const tiltNeon = Tilt_Neon({
   variable: "--font-tilt-neon",
@@ -26,6 +27,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${tiltNeon.variable} antialiased`}>
         <main className="bg-[#F5F3FE] min-h-screen flex flex-col items-center">
+        <NuqsAdapter>
           <nav className="w-full h-25 
           bg-gradient-to-r from-[#001233] to-[#023e7d]
           flex items-center justify-between px-20"
@@ -57,7 +59,8 @@ export default function RootLayout({
             </div>
 
           </nav>
-        {children}
+          {children}
+        </NuqsAdapter>
         </main>
       </body>
     </html>
