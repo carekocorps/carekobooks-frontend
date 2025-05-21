@@ -6,6 +6,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
   
   interface DropdownProps {
     children: React.ReactNode;
@@ -18,13 +19,15 @@ import {
           {children}
         </DropdownMenuTrigger>
   
-        <DropdownMenuContent className="w-56 p-2 text-base mr-20"> {/* Aumenta largura e texto */}
+        <DropdownMenuContent className="w-56 p-2 text-base mr-20">
           <DropdownMenuLabel className="text-gray-700 text-sm">Minha Conta</DropdownMenuLabel>
           <DropdownMenuSeparator />
   
           <DropdownMenuItem className="flex items-center gap-2 hover:bg-zinc-100 cursor-pointer">
             <i className="bi bi-person-fill text-lg text-zinc-600" />
-            Meu Perfil
+            <Link href="/user/profile">
+              Meu Perfil
+            </Link>
           </DropdownMenuItem>
   
           <DropdownMenuItem className="flex items-center gap-2 hover:bg-zinc-100 cursor-pointer">

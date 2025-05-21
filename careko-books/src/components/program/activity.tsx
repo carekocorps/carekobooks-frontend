@@ -10,7 +10,7 @@ type ActivityProps = {
 
 export default function Activity({username, livro, horario, imagem}: ActivityProps){
     return(
-        <div className="w-full bg-white rounded-md flex flex-col shadow-md p-6 gap-2 border-2 justify-center">
+        <div className="w-100 bg-white rounded-md flex flex-col shadow-md p-6 gap-2 border-2 justify-center">
 
 
             <div className="flex gap-4">
@@ -21,7 +21,7 @@ export default function Activity({username, livro, horario, imagem}: ActivityPro
                         className="object-cover w-full h-full"
                     />
                 </Avatar>
-                <h2 className="text-[#2E2E2E] text-">
+                <h2 className="text-[#2E2E2E] text">
                     <strong>{username}</strong> favoritou <span className="text-[#1e3472]">{livro}</span>
                 </h2>
             </div>
