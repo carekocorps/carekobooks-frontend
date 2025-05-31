@@ -1,28 +1,102 @@
-import { BookType } from "@/types/book";
+import { useState } from "react";
 import Image from "next/image";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { BookType } from "@/types/book";
+import { BookService } from '@/services/books.service';
+import UpdateBookModal from "./update-book-modal";
 
+interface BookProps {
+  bookItem: BookType;
+  isAdmin?: boolean;
+  onDeleted?: () => void; 
+}
 
-  export default function Book(bookProps: {bookItem: BookType}) {
-    const { bookItem } = bookProps
-    return (
-      <div
-        className="flex flex-col items-center justify-start gap-2 w-40 
-                   overflow-hidden rounded-xl border-3 border-white/20 
-                   bg-white/10 backdrop-blur-md shadow-md 
-                   transition-transform duration-300 hover:scale-105"
-      >
-        <div className="relative w-40 h-60 shadow-md">
-          <Image
-            src={bookItem.image.url}
-            alt="Capa de Livro"
-            fill
-            className="object-cover rounded-t-md"
-          />
-        </div>
-  
-        <h2 className="w-full h-10 text-sm text-center line-clamp-2">
-          {bookItem.title}
-        </h2>
+export default function Book({ bookItem, isAdmin = false, onDeleted }: BookProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      await BookService.deleteBook(bookItem.id);
+      setIsOpen(false);
+      if (onDeleted) onDeleted();
+    } catch (error) {
+      console.error("Erro ao excluir o livro:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <div
+      className="flex flex-col items-center justify-start gap-1 w-40
+                 overflow-hidden rounded-xl border-6 border-white/30
+                 bg-white/10 backdrop-blur-md shadow-md
+                 transition-transform duration-300 hover:scale-105"
+    >
+      <div className="relative w-40 h-50 shadow-md">
+        <Image
+          src={bookItem.image.url}
+          alt={`Capa do livro ${bookItem.title}`}
+          fill
+          className="object-cover rounded-t-md"
+        />
       </div>
-    );
-  }
+
+      <h2 className="w-full h-10 text-sm text-center line-clamp-2 mb-1">
+        {bookItem.title}
+      </h2>
+
+      {isAdmin && (
+        <div className="flex gap-2 justify-center items-center">
+          
+          <UpdateBookModal/>
+
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-8 h-8 rounded-md border border-red-400 bg-red-100 text-red-700 p-0
+                           flex items-center justify-center shadow-sm
+                           transform transition-transform duration-200 hover:scale-105 hover:bg-red-200"
+              >
+                <i className="bi bi-trash text-base"></i>
+              </Button>
+            </DialogTrigger>
+
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Tem certeza que deseja excluir?</DialogTitle>
+                <DialogDescription>
+                  Esta ação é irreversível. O livro será permanentemente removido.
+                </DialogDescription>
+              </DialogHeader>
+
+              <DialogFooter className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsOpen(false)}
+                  disabled={isDeleting}
+                  className="border-gray-300 text-gray-700 hover:bg-gray-100"
+                >
+                  Cancelar
+                </Button>
+
+                <Button
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="bg-red-600 text-white hover:bg-red-700"
+                >
+                  {isDeleting ? "Excluindo..." : "Sim, excluir!"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      )}
+    </div>
+  );
+}
