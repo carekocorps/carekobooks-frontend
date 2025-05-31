@@ -14,7 +14,7 @@ Com o CarekoBooks, você organiza sua biblioteca digital e compartilha experiên
 
 ## Como funciona?
 
-1. **Criação de Conta**: Faça login para acessar a plataforma e personalizar sua estante virtual.
+1. **Criação de Conta**: Faça login para acessar a plataforma e personalizar sua estante virtual de livros.
 2. **Acompanhamento de Livros**: Visualize e registre seu progresso nos livros já cadastrados no banco de dados.
 3. **Conecte-se com Amigos**: Siga outros usuários, compartilhe suas leituras e acompanhe suas atividades.
 4. **Acompanhe o Progresso**: Mantenha o controle do que você está lendo e compartilhe suas conquistas de leitura.
