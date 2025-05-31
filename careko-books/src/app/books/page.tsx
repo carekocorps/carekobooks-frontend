@@ -11,7 +11,7 @@ import { SkeletonCard } from '@/components/program/skeleton-card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function SearchResultsPage() {
-  const { books, loading, searchQuery, totalPages } = useQueries();
+  const { books, loading, searchQuery, totalPages, page, setPage } = useQueries();
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -73,14 +73,14 @@ export default function SearchResultsPage() {
               {books.map(book => {
                 return (
                   <div key={book.id}>
-                    <Book bookItem={book}/>
+                    <Book bookItem={book} isAdmin={false}/>
                   </div>
                 )
               })}
             </ul>
           )}
 
-          <PaginationDemo totalPages={totalPages}/>
+          <PaginationDemo totalPages={totalPages} page={page} setPage={setPage} />
         </section>
       </div>
     </main>

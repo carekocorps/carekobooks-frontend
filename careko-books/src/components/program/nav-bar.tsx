@@ -19,9 +19,9 @@ export default function NavBar(){
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <Link href="/dashboard" passHref>
+          <Link href="/auth" passHref>
             <NavigationMenuLink className="px-4 py-2 text-l">
-              Dashboard
+              Threads
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
@@ -33,6 +33,15 @@ export default function NavBar(){
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
+
+        <NavigationMenuItem>
+          <Link href="/adm" passHref>
+            <NavigationMenuLink className="px-4 py-2 text-l">
+              Administrador
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+
       </NavigationMenuList>
     </NavigationMenu>
     );
