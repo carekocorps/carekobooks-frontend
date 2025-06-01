@@ -6,7 +6,7 @@ import { useQueries } from '@/hooks/useQueries';
 import CarouselBooks from '@/components/program/books-carousel';
 import { SkeletonCard } from '@/components/program/skeleton-card';
 import SearchBar from '@/components/program/search-bar';
-import CreateBookModal from '@/components/program/create-book-modal';  // ajuste o caminho conforme sua estrutura
+import CreateBookModal from '@/components/program/create-book-modal'; 
 
 export default function CreateBooks() {
   const { books, loading, searchQuery, totalPages, page, setPage } = useQueries({ initialPageSize: 14 });

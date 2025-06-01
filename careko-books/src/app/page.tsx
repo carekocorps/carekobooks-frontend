@@ -2,11 +2,13 @@
 
 import Banner from "@/components/program/banners";
 import Activity from "@/components/program/activity";
-import { useBooks } from "@/hooks/useBooks";
 import BookSection from "@/components/program/book-section";
+import { useQueries } from "@/hooks/useQueries";
 
 export default function Home() {
-  const { books, loading } = useBooks();
+
+  const { books: recentBooks, loading } = useQueries({ initialOrderBy: 'createdAt', initialIsAscending: false });
+  const { books } = useQueries();
 
   return (
     <section className="flex flex-col w-350 y- mt-4 gap-15">
@@ -16,7 +18,7 @@ export default function Home() {
         <div className="flex flex-col gap-4">
           <BookSection title="Popular na sua rede" iconClass="bi bi-lightbulb-fill" books={books} loading={loading} />
           <BookSection title="Continue Lendo" iconClass="bi bi-book-fill" books={books} loading={loading} />
-          <BookSection title="Livros mais recentes" iconClass="bi bi-bookmarks-fill" books={books} loading={loading} />
+          <BookSection title="Livros mais recentes" iconClass="bi bi-bookmarks-fill" books={recentBooks} loading={loading} />
         </div>
 
         <div className="flex flex-col gap-4 rounded-xl">
