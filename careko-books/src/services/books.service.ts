@@ -1,12 +1,16 @@
 import api from "./api";
 
 export const BookService = {
-  getBooks: async (page = 1, size = 10, title = '') => {
+  getBooks: async (page = 1, size = 10, title = '', orderBy = 'title',
+    isAscending = true
+) => {
     return api.get("/api/v1/books", {
       params: {
         title,
         pageNumber: page - 1,
         pageSize: size,
+        orderBy: orderBy,
+        isAscendingOrder: isAscending,
       },
     });
   },

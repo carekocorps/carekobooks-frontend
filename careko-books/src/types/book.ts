@@ -41,3 +41,4 @@ export type Genre = {
   createdAt: string;
   updatedAt: string;
 };
+
