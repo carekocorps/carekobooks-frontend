@@ -4,10 +4,10 @@ import FilterBar from '@/components/program/filter-bar';
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { PaginationDemo } from '@/components/program/pagination-demo';
-import Book from '@/components/program/book';
+import Book from '@/components/program/book/book';
 
 import { useQueries } from '@/hooks/useQueries';
-import CarouselBooks from '@/components/program/books-carousel';
+import CarouselBooks from '@/components/program/book/books-carousel';
 import { SkeletonCard } from '@/components/program/skeleton-card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowUp, ArrowDown } from 'lucide-react';

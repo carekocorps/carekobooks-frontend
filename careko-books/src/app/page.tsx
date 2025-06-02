@@ -2,7 +2,7 @@
 
 import Banner from "@/components/program/banners";
 import Activity from "@/components/program/activity";
-import BookSection from "@/components/program/book-section";
+import BookSection from "@/components/program/book/book-section";
 import { useQueries } from "@/hooks/useQueries";
 
 export default function Home() {

@@ -30,4 +30,8 @@ export const BookService = {
   }) => {
     return api.post("/api/v1/books", bookData);
   },
+
+  clearBookCache: async () => {
+    return api.delete("/api/v1/books/cache");
+  }
 };

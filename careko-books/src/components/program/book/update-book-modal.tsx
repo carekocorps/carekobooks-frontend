@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "../ui/dialog";
-import { Button } from "../ui/button";
 import { BookService } from "@/services/books.service";
-import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
-import { Label } from "../ui/label";
-import { Separator } from "../ui/separator";
+
 import { CalendarIcon } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DialogTrigger } from "@radix-ui/react-dialog";
+import { Button } from "@/components/ui/button";
 
 export default function UpdateBookModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -81,7 +83,6 @@ export default function UpdateBookModal() {
         </DialogHeader>
 
         <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-          {/* Seção Informações Básicas */}
           <div className="space-y-4 md:col-span-1">
             <div className="space-y-1">
               <Label htmlFor="title" className="flex items-center gap-1 text-sm font-medium">
@@ -132,7 +133,6 @@ export default function UpdateBookModal() {
             </div>
           </div>
 
-          {/* Seção Detalhes */}
           <div className="space-y-4 md:col-span-1">
             <div className="space-y-1">
               <Label htmlFor="publishedAt" className="flex items-center gap-1 text-sm font-medium">
@@ -184,7 +184,6 @@ export default function UpdateBookModal() {
             </div>
           </div>
 
-          {/* Textarea que ocupa duas colunas */}
           <div className="space-y-1 md:col-span-2">
             <Label htmlFor="synopsis" className="flex items-center gap-1 text-sm font-medium">
               <i className="bi bi-card-text text-primary"></i>

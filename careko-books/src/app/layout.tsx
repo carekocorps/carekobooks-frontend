@@ -7,6 +7,7 @@ import Dropdown from "@/components/program/dropdown";
 import SearchBar from "@/components/program/search-bar";
 import {NuqsAdapter} from "nuqs/adapters/next"
 import Link from "next/link";
+import { Toaster } from "sonner";
 
 const tiltNeon = Tilt_Neon({
   variable: "--font-tilt-neon",
@@ -62,6 +63,7 @@ export default function RootLayout({
 
           </nav>
           {children}
+          <Toaster richColors />
         </NuqsAdapter>
         </main>
       </body>
