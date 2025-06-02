@@ -39,8 +39,7 @@ export default function SearchResultsPage() {
     ],
     users: [
       { value: 'username', label: 'Nome de Usuário' },
-      { value: 'created-at', label: 'Data de Registro' },
-      { value: 'book-count', label: 'Livros Lidos' }
+      { value: 'published-at', label: 'Data de Registro' },
     ]
   };
 
@@ -135,7 +134,7 @@ export default function SearchResultsPage() {
             <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {users.map(user => (
                 <li key={user.id}>
-                  <UserCard />
+                  <UserCard user={user}/>
                 </li>
               ))}
             </ul>

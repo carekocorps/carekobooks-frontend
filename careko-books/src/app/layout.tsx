@@ -27,10 +27,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${tiltNeon.variable} antialiased`}>
-        <main className="bg-[#F5F3FE] min-h-screen flex flex-col items-center">
+        <main className="bg-white min-h-screen flex flex-col items-center">
         <NuqsAdapter>
           <nav className="w-full h-25 
-          bg-gradient-to-r from-[#001233] to-[#023e7d]
+          bg-[#001233]
           flex items-center justify-between px-20"
           >
             <Link href="/" passHref>
@@ -47,7 +47,7 @@ export default function RootLayout({
               <Dropdown >
                 <div className="flex items-center justify-center gap-3 cursor-pointer">
 
-                <Avatar className="w-12 h-12">
+                <Avatar className="w-12 h-12 ">
                   <AvatarImage
                     src="/image.png"
                     alt="Imagem de avatar"

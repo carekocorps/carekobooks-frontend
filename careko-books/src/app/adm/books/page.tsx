@@ -8,7 +8,7 @@ import { SkeletonCard } from '@/components/program/skeleton-card';
 import SearchBar from '@/components/program/search-bar';
 import CreateBookModal from '@/components/program/create-book-modal'; 
 
-export default function CreateBooks() {
+export default function Books() {
   const { books, loading, searchQuery, totalPages, page, setPage } = useQueries({ initialPageSize: 14 });
 
   return (
