@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BookService } from "@/services/books.service";
 
 import { CalendarIcon } from "lucide-react";
@@ -9,8 +9,13 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
+import { GenreType } from "@/types/genre";
 
-export default function UpdateBookModal() {
+interface UpdateBookModalProps {
+  id : number;
+}
+
+export default function UpdateBookModal({ id }: UpdateBookModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -22,6 +27,33 @@ export default function UpdateBookModal() {
     genres: [] as string[],
   });
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
+
+  useEffect(() => {
+  if (isOpen && id) {
+    setLoadingData(true);
+    BookService.getBookById(id)
+      .then((response) => {
+        if (response.data) {
+          setFormData({
+            title: response.data.title || "",
+            synopsis: response.data.synopsis || "",
+            authorName: response.data.authorName || "",
+            publisherName: response.data.publisherName || "",
+            publishedAt: response.data.publishedAt || "",
+            pageCount: response.data.pageCount || 0,
+            genres: response.data.genres.map((g: GenreType) => g.name) || [],
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Erro ao carregar livro:", error);
+      })
+      .finally(() => {
+        setLoadingData(false);
+      });
+  }
+  }, [isOpen, id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -38,11 +70,11 @@ export default function UpdateBookModal() {
     }));
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await BookService.createBook(formData);
+      await BookService.updateBook(id,formData);
       setIsOpen(false);
       setFormData({
         title: "",
@@ -54,7 +86,7 @@ export default function UpdateBookModal() {
         genres: [],
       });
     } catch (error) {
-      console.error("Erro ao criar livro:", error);
+      console.error("Erro ao atualizar livro:", error);
     } finally {
       setLoading(false);
     }
@@ -82,7 +114,7 @@ export default function UpdateBookModal() {
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+        <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
           <div className="space-y-4 md:col-span-1">
             <div className="space-y-1">
               <Label htmlFor="title" className="flex items-center gap-1 text-sm font-medium">

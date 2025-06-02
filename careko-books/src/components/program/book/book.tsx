@@ -1,6 +1,5 @@
-import { useState } from "react";
+
 import Image from "next/image";
-import { Button } from "../../ui/button";
 import { BookType } from "@/types/book";
 import UpdateBookModal from "./update-book-modal";
 import DeleteBookModal from "./delete-book-modal";
@@ -34,7 +33,7 @@ export default function Book({ bookItem, isAdmin = false, onDeleted }: BookProps
 
       {isAdmin && (
         <div className="flex gap-2 justify-center items-center">
-          <UpdateBookModal />
+          <UpdateBookModal id={bookItem.id}/>
           <DeleteBookModal bookId={bookItem.id} onDeleted={onDeleted} />
         </div>
       )}
