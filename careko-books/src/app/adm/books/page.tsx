@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowUp, ArrowDown } from 'lucide-react';
+import { ArrowUp, ArrowDown, Search } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PaginationDemo } from '@/components/program/pagination-demo';
 import Book from '@/components/program/book/book';
@@ -9,10 +9,8 @@ import CarouselBooks from '@/components/program/book/books-carousel';
 import { SkeletonCard } from '@/components/program/skeleton-card';
 import CreateBookModal from '@/components/program/book/create-book-modal';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
 import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
-import { GenreService } from '@/services/genre.service';
 import { BookService } from '@/services/books.service';
 
 export default function Books() {
@@ -50,25 +48,26 @@ export default function Books() {
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-8">
-      <header className="space-y-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+      <header className="space-y-6">
+        {/* Título e ações */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-gray-800">Gerenciamento de Livros</h1>
             <p className="text-gray-600">Administre o acervo literário da plataforma</p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
-            <Button 
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <Button
               onClick={handleClearCache}
               variant="outline"
-              className="gap-2 border-red-600 text-red-600 hover:bg-red-50 hover:text-red-700"
+              className="gap-2 border-red-600 text-red-600 hover:bg-red-50 hover:text-red-700 w-full sm:w-auto"
             >
               <i className="bi bi-trash3"></i>
               Limpar Cache
             </Button>
 
             <Select value={orderBy} onValueChange={handleOrderChange}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Ordenar por" />
               </SelectTrigger>
               <SelectContent>
@@ -86,23 +85,25 @@ export default function Books() {
                 ))}
               </SelectContent>
             </Select>
-            
+
             <CreateBookModal />
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="text-sm bg-gray-100 px-3 py-1 rounded-full">
+        {/* Resumo e Filtros Ativos */}
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <span className="bg-gray-100 px-3 py-1 rounded-full">
             {totalElements} {totalElements === 1 ? 'livro' : 'livros'}
           </span>
           {searchQuery && (
-            <span className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full">
-              Filtrado: "{searchQuery}"
+            <span className="bg-primary/10 text-primary px-3 py-1 rounded-full">
+              Filtrado: {searchQuery}
             </span>
           )}
         </div>
 
-        <div className="relative w-full max-w-md">
+        {/* Campo de busca */}
+        <div className="relative w-full max-w-lg">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Pesquisar livros..."
@@ -124,6 +125,7 @@ export default function Books() {
         </div>
       </header>
 
+      {/* Seção de Livros */}
       <section aria-live="polite" aria-busy={loading}>
         {loading ? (
           <CarouselBooks
@@ -137,7 +139,10 @@ export default function Books() {
             {!searchQuery && <CreateBookModal />}
           </div>
         ) : (
-          <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4" role="list">
+          <ul
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4"
+            role="list"
+          >
             {books.map((book) => (
               <li key={book.id}>
                 <Book bookItem={book} isAdmin={true} />
@@ -147,8 +152,9 @@ export default function Books() {
         )}
       </section>
 
+      {/* Paginação */}
       {totalPages > 1 && (
-        <nav aria-label="Paginação" className="flex justify-center">
+        <nav aria-label="Paginação" className="flex justify-center pt-4">
           <PaginationDemo totalPages={totalPages} page={page} setPage={setPage} />
         </nav>
       )}

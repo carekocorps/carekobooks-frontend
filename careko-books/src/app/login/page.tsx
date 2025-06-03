@@ -1,17 +1,53 @@
 "use client";
 
+import { AuthService } from "@/services/auth.service";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 
 export default function LoginPage() {
+    const router = useRouter();
+
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError("");
+
+        try {
+            const response = await AuthService.signIn(username, password);
+            console.log("Login bem-sucedido!", response.data);
+            router.push("/");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <section className="flex justify-center items-center min-h-screen bg-[#F5F3FE] px-4">
             <div className="flex flex-col lg:flex-row bg-white shadow-lg rounded-lg max-w-4xl w-full overflow-hidden">
                 {/* Login */}
                 <div className="w-full lg:w-1/2 p-8 border-b lg:border-b-0 lg:border-r border-gray-200">
                     <h2 className="text-2xl font-bold text-[#023e7d] mb-6">Já sou CarekoBooker</h2>
-                    <form className="flex flex-col gap-4">
-                        <input type="text" placeholder="E-mail ou nome de usuário" className="input" />
-                        <input type="password" placeholder="Senha" className="input" />
+                    <form onSubmit={handleLogin} className="flex flex-col gap-4">
+                        <input
+                            type="text"
+                            placeholder="E-mail ou nome de usuário"
+                            className="input"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                        <input
+                            type="password"
+                            placeholder="Senha"
+                            className="input"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
                         <a href="#" className="text-sm text-blue-600 hover:underline">Esqueceu a senha</a>
                         <button className="btn-primary">Entrar</button>
                         <button className="btn-google whitespace-nowrap">

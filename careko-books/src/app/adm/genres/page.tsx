@@ -42,26 +42,25 @@ export default function Genres() {
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-8">
-      <header className="space-y-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+      <header className="space-y-6">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 flex-wrap">
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-gray-800">Gerenciamento de Gêneros</h1>
             <p className="text-gray-600">Administre os gêneros literários da plataforma</p>
           </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            
+
+          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             <Button 
               onClick={handleClearCache}
               variant="outline"
-              className="gap-2 border-red-600 text-red-600 hover:bg-red-50 hover:text-red-700"
+              className="gap-2 border-red-600 text-red-600 hover:bg-red-50 hover:text-red-700 w-full sm:w-auto"
             >
               <i className="bi bi-trash3"></i>
               Limpar Cache
             </Button>
-            
+
             <Select value={orderBy} onValueChange={handleOrderChange}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Ordenar por" />
               </SelectTrigger>
               <SelectContent>
@@ -79,7 +78,10 @@ export default function Genres() {
                 ))}
               </SelectContent>
             </Select>
-            <CreateGenreModal />
+
+            <div className="w-full sm:w-auto">
+              <CreateGenreModal />
+            </div>
           </div>
         </div>
 
@@ -89,7 +91,7 @@ export default function Genres() {
           </span>
           {searchQuery && (
             <span className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full">
-              Filtrado: "{searchQuery}"
+              Filtrado: {searchQuery}
             </span>
           )}
         </div>
@@ -97,7 +99,7 @@ export default function Genres() {
 
       <section>
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {[...Array(8)].map((_, index) => (
               <SkeletonCard key={index} />
             ))}
@@ -108,7 +110,7 @@ export default function Genres() {
             {!searchQuery && <CreateGenreModal />}
           </div>
         ) : (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {genres.map((genre) => (
               <li key={genre.id}>
                 <GenreCard genre={genre} />

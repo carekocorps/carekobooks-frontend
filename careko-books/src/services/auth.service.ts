@@ -5,8 +5,6 @@ export const AuthService = {
     return api.post("/api/v1/auth/signin", {
       username,
       password,
-    }, {
-      withCredentials: true, 
     });
   },
 };
