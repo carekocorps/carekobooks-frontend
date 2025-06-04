@@ -50,6 +50,23 @@ export const useQueries = ({
     defaultValue: initialIsAscending,
   });
 
+  const [filters, setFilters] = useQueryState('filters', {
+    history: 'push',
+    parse: (value) => {
+      try {
+        return value ? JSON.parse(decodeURIComponent(value)) : {};
+      } catch {
+        return {};
+      }
+    },
+    serialize: (value) => {
+      return value && Object.keys(value).length > 0 
+        ? encodeURIComponent(JSON.stringify(value))
+        : '';
+    },
+    defaultValue: {},
+  });
+
   const [resourceType, setResourceType] = useState<'books' | 'users'>(initialResourceType);
 
   const [books, setBooks] = useState<BookType[]>([]);
@@ -69,7 +86,8 @@ export const useQueries = ({
             pageSize, 
             searchQuery,
             orderBy,
-            isAscending
+            isAscending,
+            filters 
           );
           const { content, pageable } = response.data;
           setBooks(content);
@@ -96,7 +114,7 @@ export const useQueries = ({
     };
 
     fetchData();
-  }, [resourceType, searchQuery, page, pageSize, orderBy, isAscending]);
+  }, [resourceType, searchQuery, page, pageSize, orderBy, isAscending, filters]); 
 
   const handleOrderChange = (newOrderBy: string) => {
     if (newOrderBy === orderBy) {
@@ -117,6 +135,7 @@ export const useQueries = ({
     setResourceType(type);
     setIsAscending(true);
     setPage(1);
+    setFilters({}); 
   };
 
   return {
@@ -138,6 +157,8 @@ export const useQueries = ({
     handleOrderChange,
     handleResourceTypeChange,
     
+    filters,
+    setFilters,
     setResourceType,
   };
 };
