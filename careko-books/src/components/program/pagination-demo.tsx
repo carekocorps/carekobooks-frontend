@@ -9,19 +9,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useQueryState } from "nuqs";
 
 interface PaginationDemoProps {
   totalPages: number;
+  page: number;
+  setPage: (page: number) => void;
 }
 
-export function PaginationDemo({ totalPages }: PaginationDemoProps) {
-  const [page, setPage] = useQueryState('page', {
-    history: 'push',
-    parse: Number,
-    defaultValue: 1,
-  });
-
+export function PaginationDemo({ totalPages, page, setPage }: PaginationDemoProps) {
   if (totalPages <= 1) return null;
 
   const handleSetPage = (newPage: number) => {
