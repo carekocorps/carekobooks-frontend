@@ -6,43 +6,47 @@ import {
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
 
-export default function NavBar(){
-    return(
+const navItems = [
+  { label: "Home", href: "/", icon: "bi-house" },
+  { label: "Threads", href: "/auth", icon: "bi-chat-dots" },
+  { label: "Seus Livros", href: "/user/profile", icon: "bi-book" },
+  { label: "Administrador", href: "/adm", icon: "bi-person-gear" },
+];
+
+function NavItem({
+  href,
+  label,
+  icon,
+}: {
+  href: string;
+  label: string;
+  icon: string;
+}) {
+  return (
+    <NavigationMenuItem>
+      <NavigationMenuLink asChild>
+        <Link href={href} className="px-4 py-2 text-sm flex items-center gap-2">
+          <i className={`bi ${icon} text-sm`}></i>
+          {label}
+        </Link>
+      </NavigationMenuLink>
+    </NavigationMenuItem>
+  );
+}
+
+export default function NavBar() {
+  return (
     <NavigationMenu>
-      <NavigationMenuList className="flex gap-6 font-semibold text-white ">
-        <NavigationMenuItem>
-          <Link href="/" passHref>
-            <NavigationMenuLink className="px-4 py-2 text-l">
-              Home
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <Link href="/auth" passHref>
-            <NavigationMenuLink className="px-4 py-2 text-l">
-              Threads
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <Link href="/user/profile" passHref>
-            <NavigationMenuLink className="px-4 py-2 text-l">
-              Seus Livros
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <Link href="/adm" passHref>
-            <NavigationMenuLink className="px-4 py-2 text-l">
-              Administrador
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-
+      <NavigationMenuList className="flex gap-6 font-semibold text-white">
+        {navItems.map((item) => (
+          <NavItem
+            key={item.href}
+            href={item.href}
+            label={item.label}
+            icon={item.icon}
+          />
+        ))}
       </NavigationMenuList>
     </NavigationMenu>
-    );
+  );
 }

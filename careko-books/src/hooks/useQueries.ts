@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
 import { BookService } from '@/services/books.service';
 import { UserService } from '@/services/user.services';
 import { BookType } from '@/types/book';
 import { UserType } from '@/types/user';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useQueryState } from 'nuqs';
 
 interface UseQueriesOptions {
@@ -14,6 +14,15 @@ interface UseQueriesOptions {
   initialOrderBy?: string;
   initialIsAscending?: boolean;
   initialResourceType?: 'books' | 'users';
+}
+
+interface BookFilters {
+  authorName?: string;
+  publishedAfter?: string;
+  publishedBefore?: string;
+  pageCountGreater?: number;
+  pageCountLower?: number;
+  genre?: string;
 }
 
 export const useQueries = ({ 
@@ -25,6 +34,7 @@ export const useQueries = ({
 }: UseQueriesOptions = {}) => {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
+  const prevFilters = useRef<BookFilters | null>(null);
 
   const [page, setPage] = useQueryState('page', {
     history: 'push',
@@ -68,7 +78,6 @@ export const useQueries = ({
   });
 
   const [resourceType, setResourceType] = useState<'books' | 'users'>(initialResourceType);
-
   const [books, setBooks] = useState<BookType[]>([]);
   const [users, setUsers] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(false);
@@ -77,7 +86,13 @@ export const useQueries = ({
 
   useEffect(() => {
     const fetchData = async () => {
+      // Verifica se os filtros realmente mudaram
+      if (JSON.stringify(filters) === JSON.stringify(prevFilters.current)) {
+        return;
+      }
+
       setLoading(true);
+      prevFilters.current = filters;
 
       try {
         if (resourceType === 'books') {
@@ -87,12 +102,15 @@ export const useQueries = ({
             searchQuery,
             orderBy,
             isAscending,
-            filters 
+            filters as BookFilters
           );
-          const { content, pageable } = response.data;
-          setBooks(content);
-          setTotalPages(Math.ceil(pageable.totalElements / pageable.pageSize));
-          setTotalElements(pageable.totalElements);
+          
+          if (response.status >= 200 && response.status < 300) {
+            const { content, pageable } = response.data;
+            setBooks(content);
+            setTotalPages(Math.ceil(pageable.totalElements / pageable.pageSize));
+            setTotalElements(pageable.totalElements);
+          }
         } else {
           const response = await UserService.getUsers(
             page, 
@@ -113,8 +131,9 @@ export const useQueries = ({
       }
     };
 
-    fetchData();
-  }, [resourceType, searchQuery, page, pageSize, orderBy, isAscending, filters]); 
+    const timer = setTimeout(fetchData, 300); // Debounce de 300ms
+    return () => clearTimeout(timer);
+  }, [resourceType, searchQuery, page, pageSize, orderBy, isAscending, filters]);
 
   const handleOrderChange = (newOrderBy: string) => {
     if (newOrderBy === orderBy) {
@@ -135,7 +154,7 @@ export const useQueries = ({
     setResourceType(type);
     setIsAscending(true);
     setPage(1);
-    setFilters({}); 
+    setFilters({});
   };
 
   return {
@@ -144,19 +163,16 @@ export const useQueries = ({
     loading,
     searchQuery,
     resourceType,
-    
     page,
     setPage,
     totalPages,
     totalElements,
     pageSize,
     setPageSize,
-    
     orderBy,
     isAscending,
     handleOrderChange,
     handleResourceTypeChange,
-    
     filters,
     setFilters,
     setResourceType,
