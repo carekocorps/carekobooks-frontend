@@ -3,9 +3,11 @@ import { ReactNode, useEffect, useState, useRef, createContext, useContext } fro
 import Keycloak from 'keycloak-js';
 import api from '@/services/api';
 
-const AuthContext = createContext<{
+interface AuthContextData {
   logout: () => void;
-} | null>(null);
+}
+
+const AuthContext = createContext<AuthContextData | null>(null);
 
 export function useAuth() {
   const context = useContext(AuthContext);
@@ -19,6 +21,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const [authStatus, setAuthStatus] = useState<'loading' | 'authenticated' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const keycloakRef = useRef<Keycloak | null>(null);
+  const refreshTokenInterval = useRef<NodeJS.Timeout | null>(null);
 
   const logout = () => {
     if (keycloakRef.current) {
@@ -27,55 +30,81 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const config = {
-      url: process.env.NEXT_PUBLIC_KEYCLOAK_URL,
-      realm: process.env.NEXT_PUBLIC_KEYCLOAK_REALM,
-      clientId: process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID,
-    };
+    const url = process.env.NEXT_PUBLIC_KEYCLOAK_URL;
+    const realm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM;
+    const clientId = process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID;
 
-    const kc = new Keycloak(config);
+    if (!url || !realm || !clientId) {
+      setAuthStatus('error');
+      setErrorMessage('Configuração do Keycloak ausente ou incorreta.');
+      return;
+    }
+
+    const kc = new Keycloak({
+      url,
+      realm,
+      clientId,
+    });
     keycloakRef.current = kc;
 
-    const initializeAuth = () => {
+    const initializeAuth = async () => {
       setAuthStatus('loading');
       setErrorMessage(null);
-
-      kc.init({
-        onLoad: 'login-required',
-        pkceMethod: 'S256',
-      })
-        .then((auth) => {
-          if (!auth) {
-            kc.login();
-          } else {
-            if (kc.token) {
-              api.defaults.headers.common['Authorization'] = `Bearer ${kc.token}`;
-              setAuthStatus('authenticated');
-            }
-
-            kc.onTokenExpired = () => {
-              kc.updateToken(30).then((updated) => {
-                if (updated && kc.token) {
-                  api.defaults.headers.common['Authorization'] = `Bearer ${kc.token}`;
-                }
-              }).catch((err) => {
-                console.error("Token refresh failed:", err);
-                setAuthStatus('error');
-                setErrorMessage('Sua sessão expirou. Por favor, faça login novamente.');
-              });
-            };
-          }
-        })
-        .catch((err) => {
-          console.error("Keycloak init error:", err);
-          setAuthStatus('error');
-          setErrorMessage(err.message || 'Falha na autenticação. Por favor, tente novamente.');
+      try {
+        const authenticated = await kc.init({
+          onLoad: 'login-required',
+          pkceMethod: 'S256',
+          checkLoginIframe: false,
         });
+
+        if (!authenticated) {
+          await kc.login();
+          return;
+        }
+
+        if (kc.token) {
+          api.defaults.headers.common['Authorization'] = `Bearer ${kc.token}`;
+          setAuthStatus('authenticated');
+        }
+
+        refreshTokenInterval.current = setInterval(() => {
+          if (kc.token) {
+            kc.updateToken(70).then((refreshed) => {
+              if (refreshed) {
+                api.defaults.headers.common['Authorization'] = `Bearer ${kc.token}`;
+              }
+            }).catch(() => {
+              setAuthStatus('error');
+              setErrorMessage('Sua sessão expirou. Por favor, faça login novamente.');
+              kc.logout();
+            });
+          }
+        }, 60000);
+
+        kc.onTokenExpired = () => {
+          kc.updateToken(30).then((updated) => {
+            if (updated && kc.token) {
+              api.defaults.headers.common['Authorization'] = `Bearer ${kc.token}`;
+            }
+          }).catch(() => {
+            setAuthStatus('error');
+            setErrorMessage('Sua sessão expirou. Por favor, faça login novamente.');
+            kc.logout();
+          });
+        };
+      } catch (err: any) {
+        console.error('Keycloak init error:', err);
+        setAuthStatus('error');
+        setErrorMessage(err?.message || 'Falha na autenticação. Por favor, tente novamente.');
+      }
     };
 
     initializeAuth();
 
     return () => {
+      if (refreshTokenInterval.current) {
+        clearInterval(refreshTokenInterval.current);
+      }
       delete api.defaults.headers.common['Authorization'];
     };
   }, []);
