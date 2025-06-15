@@ -3,6 +3,7 @@ import Image from "next/image";
 import { BookType } from "@/types/book";
 import UpdateBookModal from "./update-book-modal";
 import DeleteBookModal from "./delete-book-modal";
+import Link from "next/link";
 
 interface BookProps {
   bookItem: BookType;
@@ -12,6 +13,7 @@ interface BookProps {
 
 export default function Book({ bookItem, isAdmin = false, onDeleted }: BookProps) {
   return (
+    <Link href={`books/${bookItem.id}`} className="no-underline">
     <div
       className="flex flex-col items-center justify-start gap-1 w-40
                  overflow-hidden rounded-xl border-6 border-white/30
@@ -38,5 +40,6 @@ export default function Book({ bookItem, isAdmin = false, onDeleted }: BookProps
         </div>
       )}
     </div>
+  </Link>
   );
 }

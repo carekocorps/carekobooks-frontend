@@ -11,7 +11,7 @@ export type UserType = {
   image: ImageType;
   followersCount: number;
   followingCount: number;
-  booksCount: number;
+  progressesCount: number;
 };
 
 export type ImageType = {

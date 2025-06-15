@@ -3,90 +3,121 @@
 import Activity from "@/components/program/activity";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { UserService } from "@/services/user.services";
-import { UserType } from "@/types/user";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface TokenPayload {
+  preferred_username: string;
+  sub?: string;
+  email?: string;
+}
 
 export default function ViewUserProfile() {
-  const [user, setUser] = useState<UserType | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userData = await UserService.getUserByUsername("ygraham");
-        setUser(userData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erro desconhecido');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, []);
+  const { user, loading, error } = useCurrentUser();
 
   if (loading) {
-    return <div>Carregando...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-12 rounded-full mx-auto" />
+          <Skeleton className="h-4 w-[250px] mx-auto" />
+          <Skeleton className="h-4 w-[200px] mx-auto" />
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Erro: {error}</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-red-500 bg-red-50 p-6 rounded-xl max-w-md text-center">
+          <h2 className="font-bold text-lg mb-2">Erro ao carregar perfil</h2>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
   }
 
   if (!user) {
-    return <div>Usuário não encontrado</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="bg-blue-50 text-blue-800 p-6 rounded-xl max-w-md text-center">
+          <h2 className="font-bold text-lg mb-2">Usuário não encontrado</h2>
+          <p>O perfil solicitado não está disponível</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <main>
-      <div className="flex gap-12 mt-25">
-        <div className="bg-white shadow-xl w-180 h-100 rounded-2xl relative overflow-visible flex flex-col justify-center items-start gap-5 pt-20">
-          <div className="absolute -top-10 left-[20%] transform -translate-x-1/2">
-            <Avatar className="w-40 h-40 border-6 border-white shadow-md">
+    <main className="p-4 md:p-8 max-w-7xl mx-auto">
+      <div className="flex flex-col lg:flex-row gap-6 mt-8">
+        <div className="bg-white dark:bg-gray-900 shadow-lg w-full lg:w-2/5 rounded-2xl relative overflow-visible flex flex-col items-start gap-5 pt-24 pb-8 px-6 border border-gray-100 dark:border-gray-800">
+          <div className="absolute -top-16 left-1/2 transform -translate-x-1/2">
+            <Avatar className="w-32 h-32 border-4 border-white dark:border-gray-900 shadow-lg">
               <AvatarImage
-                src={user.image?.url || "/image.png"}
+                src={user.image?.url || "/default-avatar.png"}
                 alt="Imagem de avatar"
                 className="object-cover w-full h-full"
               />
             </Avatar>
           </div>
 
-          <div className="flex flex-col m-15 gap-5">
-            <div className="flex justify-between items-center">
-              <div className="flex flex-col items-start text-center">
-                <h1 className="text-3xl">{user.displayName}</h1>
-                <h2>@{user.username}</h2>
+          <div className="flex flex-col w-full gap-6 mt-4">
+            <div className="flex flex-col items-center w-full gap-4">
+              <div className="text-center">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
+                  {user.displayName}
+                </h1>
+                <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between w-full px-4">
-                  <h1 className="text-sm">10 seguidores</h1>
-                  <h1 className="text-sm">10 seguindo</h1>
-                  <h1 className="text-sm">3 livros</h1>
+              <div className="flex justify-center gap-6 w-full text-sm text-gray-600 dark:text-gray-300">
+                <div className="flex flex-col items-center">
+                  <span className="font-bold text-gray-900 dark:text-white">{user.followersCount}</span>
+                  <span>Seguidores</span>
                 </div>
+                <div className="flex flex-col items-center">
+                  <span className="font-bold text-gray-900 dark:text-white">{user.followingCount}</span>
+                  <span>Seguindo</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="font-bold text-gray-900 dark:text-white">{user.progressesCount}</span>
+                  <span>Livros</span>
+                </div>
+              </div>
 
-                <div className="flex gap-4 px-4 justify-between">
-                  <Button variant="outline">Configurações</Button>
-                  <Button variant="outline">Editar Perfil</Button>
-                </div>
+              <div className="flex-col sm:flex-row gap- w-full max-w-xs">
+                <Button variant="outline" className="w-full">Configurações</Button>
+                <Button className="w-full bg-blue-600 hover:bg-blue-700">Editar Perfil</Button>
               </div>
             </div>
 
-            <div className="w-150 h-30 bg-gray-200 rounded-2xl">
-              <p className="m-10">{user.description || "Sem descrição"}</p>
+            <div className="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+              <p className="text-gray-700 dark:text-gray-300 text-center">
+                {user.description || "Este usuário ainda não adicionou uma descrição."}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 shadow-xl w-180 h-100 rounded-2xl 
-          flex flex-col justify-center items-center">
-          <h1 className="text-white text-3xl m-7">
-            Mural de Atividades
-          </h1>
+        <div className="w-full lg:w-3/5 space-y-6">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg rounded-2xl p-6">
+            <h1 className="text-white text-2xl font-bold mb-6">
+              Mural de Atividades
+            </h1>
 
-          <Activity username="@benilton" livro="É Assim que Acaba" horario="12:00" imagem="/usersMock/ro.png" />
+            <div className="space-y-4">
+              <Activity 
+                username="@parkjimin" 
+                livro="Mulherzinhas" 
+                horario="15:00" 
+                imagem="/usersMock/rose.png" 
+                acao="leu" 
+              />
+            </div>
+          </div>
+        
         </div>
       </div>
     </main>

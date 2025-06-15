@@ -1,7 +1,11 @@
 'use client';
-import { ReactNode, useEffect, useState, useRef, createContext, useContext } from 'react';
-import Keycloak from 'keycloak-js';
-import api from '@/services/api';
+import { ReactNode, useEffect, useState, createContext, useContext } from 'react';
+import {
+  initializeAuth,
+  cleanupAuth,
+  logout as keycloakLogout,
+  retryLogin
+} from '@/services/auth.service';
 
 interface AuthContextData {
   logout: () => void;
@@ -20,100 +24,20 @@ export function useAuth() {
 export default function AuthProvider({ children }: { children: ReactNode }) {
   const [authStatus, setAuthStatus] = useState<'loading' | 'authenticated' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const keycloakRef = useRef<Keycloak | null>(null);
-  const refreshTokenInterval = useRef<NodeJS.Timeout | null>(null);
 
-  const logout = () => {
-    if (keycloakRef.current) {
-      keycloakRef.current.logout();
-    }
-  };
+  const logout = () => keycloakLogout();
 
   useEffect(() => {
-    const url = process.env.NEXT_PUBLIC_KEYCLOAK_URL;
-    const realm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM;
-    const clientId = process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID;
-
-    if (!url || !realm || !clientId) {
-      setAuthStatus('error');
-      setErrorMessage('Configuração do Keycloak ausente ou incorreta.');
-      return;
-    }
-
-    const kc = new Keycloak({
-      url,
-      realm,
-      clientId,
-    });
-    keycloakRef.current = kc;
-
-    const initializeAuth = async () => {
-      setAuthStatus('loading');
-      setErrorMessage(null);
-      try {
-        const authenticated = await kc.init({
-          onLoad: 'login-required',
-          pkceMethod: 'S256',
-          checkLoginIframe: false,
-        });
-
-        if (!authenticated) {
-          await kc.login();
-          return;
-        }
-
-        if (kc.token) {
-          api.defaults.headers.common['Authorization'] = `Bearer ${kc.token}`;
-          setAuthStatus('authenticated');
-        }
-
-        refreshTokenInterval.current = setInterval(() => {
-          if (kc.token) {
-            kc.updateToken(70).then((refreshed) => {
-              if (refreshed) {
-                api.defaults.headers.common['Authorization'] = `Bearer ${kc.token}`;
-              }
-            }).catch(() => {
-              setAuthStatus('error');
-              setErrorMessage('Sua sessão expirou. Por favor, faça login novamente.');
-              kc.logout();
-            });
-          }
-        }, 60000);
-
-        kc.onTokenExpired = () => {
-          kc.updateToken(30).then((updated) => {
-            if (updated && kc.token) {
-              api.defaults.headers.common['Authorization'] = `Bearer ${kc.token}`;
-            }
-          }).catch(() => {
-            setAuthStatus('error');
-            setErrorMessage('Sua sessão expirou. Por favor, faça login novamente.');
-            kc.logout();
-          });
-        };
-      } catch (err: any) {
-        console.error('Keycloak init error:', err);
+    initializeAuth(
+      () => setAuthStatus('authenticated'),
+      (msg) => {
+        setErrorMessage(msg);
         setAuthStatus('error');
-        setErrorMessage(err?.message || 'Falha na autenticação. Por favor, tente novamente.');
       }
-    };
+    );
 
-    initializeAuth();
-
-    return () => {
-      if (refreshTokenInterval.current) {
-        clearInterval(refreshTokenInterval.current);
-      }
-      delete api.defaults.headers.common['Authorization'];
-    };
+    return () => cleanupAuth();
   }, []);
-
-  const handleRetry = () => {
-    if (keycloakRef.current) {
-      keycloakRef.current.login();
-    }
-  };
 
   if (authStatus === 'authenticated') {
     return (
@@ -131,7 +55,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             <div className="flex justify-center">
               <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
-            <h2 className="text-xl font-semibold text-center text-gray-800">Autenticando...</h2>
+            <h2 className="text-xl font-semibold text-center text-gray-800">Carregando...</h2>
             <p className="text-center text-gray-600">Por favor, aguarde enquanto conectamos você ao sistema.</p>
           </>
         ) : (
@@ -144,7 +68,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             <h2 className="text-xl font-semibold text-center text-gray-800">Erro na autenticação</h2>
             <p className="text-center text-gray-600">{errorMessage}</p>
             <button
-              onClick={handleRetry}
+              onClick={retryLogin}
               className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               Fazer login novamente

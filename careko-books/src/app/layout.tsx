@@ -1,4 +1,5 @@
 'use client';
+
 import { Tilt_Neon, Tilt_Warp } from "next/font/google";
 import "./globals.css";
 import { Avatar } from "@/components/ui/avatar";
@@ -10,6 +11,7 @@ import { NuqsAdapter } from "nuqs/adapters/next";
 import Link from "next/link";
 import { Toaster } from "sonner";
 import AuthProvider, { useAuth } from "@/components/program/auth/auth-provider"; 
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const tiltNeon = Tilt_Neon({
   variable: "--font-tilt-neon",
@@ -24,35 +26,41 @@ const tiltWarp = Tilt_Warp({
 
 function AuthenticatedContent({ children }: { children: React.ReactNode }) { 
   const { logout } = useAuth();
+  const { user, loading, error } = useCurrentUser();
 
   return (
     <main className="bg-white min-h-screen flex flex-col items-center">
       <NuqsAdapter>
-        <nav className="w-full h-25 bg-[#001233] flex items-center justify-between px-20">
-          <Link href="/" passHref>
-            <div className="flex flex-col text-white font-bold">
-              <h1 className={`text-3xl ${tiltWarp.className}`}>CarekoBooks</h1>
-              <p className="text-sm">Leia, Registre e Compartilhe</p>
-            </div>
-          </Link>
-          <NavBar />
-          
-          <div className="flex items-center justify-center gap-4">
-            <SearchBar/>
-            <Dropdown onLogout={logout}>
-              <div className="flex items-center justify-center gap-3 cursor-pointer">
-                <Avatar className="w-12 h-12 ">
-                  <AvatarImage
-                    src="/image.png"
-                    alt="Imagem de avatar"
-                    className="object-cover w-full h-full"
-                  />
-                </Avatar>
-                <i className="bi bi-chevron-down text-white"></i>
+        <nav className="w-full bg-[#001233] px-4 md:px-8 py-4">
+          <div className="max-w-screen-xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            
+            <Link href="/" passHref>
+              <div className="flex flex-col text-white font-bold leading-tight">
+                <h1 className={`text-2xl sm:text-3xl ${tiltWarp.className}`}>CarekoBooks</h1>
+                <p className="text-sm sm:text-base">Leia, Registre e Compartilhe</p>
               </div>
-            </Dropdown>
+            </Link>
+
+            <div className="flex items-center gap-4 flex-wrap justify-center w-full sm:w-auto">
+              <NavBar />
+              <SearchBar />
+
+              <Dropdown onLogout={logout}>
+                <div className="flex items-center gap-3 cursor-pointer">
+                  <Avatar className="w-10 h-10 sm:w-12 sm:h-12">
+                    <AvatarImage
+                      src={user?.image?.url ?? "/default-avatar.png"}
+                      alt="Imagem de avatar"
+                      className="object-cover w-full h-full"
+                    />
+                  </Avatar>
+                  <i className="bi bi-chevron-down text-white text-sm sm:text-base"></i>
+                </div>
+              </Dropdown>
+            </div>
           </div>
         </nav>
+
         {children}
         <Toaster richColors />
       </NuqsAdapter>
@@ -75,3 +83,4 @@ export default function RootLayout({
     </html>
   );
 }
+
