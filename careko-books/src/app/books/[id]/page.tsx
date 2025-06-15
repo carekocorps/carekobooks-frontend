@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
-import { Star, Check, Heart, Pen } from "lucide-react";
+import { Star, Pen } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { BookService } from "@/services/books.service";
+import { ProgressActions } from "@/components/program/progresses/progresses-actions";
+
 
 interface BookDetailPageProps {
   params: { id: number };
@@ -61,22 +63,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white py-5 text-base rounded-xl transition-all duration-200 hover:scale-[1.02]">
-              Quero Ler
-            </Button>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white py-5 text-base flex gap-2 items-center justify-center rounded-xl transition-all duration-200 hover:scale-[1.02]">
-              <Check className="w-5 h-5" />
-              Já Li
-            </Button>
-            <Button
-              variant="destructive"
-              className="py-5 text-base flex gap-2 items-center justify-center rounded-xl transition-all duration-200 hover:scale-[1.02]"
-            >
-              <Heart className="w-5 h-5" />
-              Favoritar
-            </Button>
-          </div>
+          <ProgressActions bookId={bookData.id} /> 
         </div>
 
         <aside className="lg:col-span-2 bg-slate-100 p-6 sm:p-8 rounded-2xl shadow-inner text-center mt-4">
