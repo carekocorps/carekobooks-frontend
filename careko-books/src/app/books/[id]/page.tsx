@@ -4,10 +4,12 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { BookService } from "@/services/books.service";
 import { ProgressActions } from "@/components/program/progresses/progresses-actions";
-
+import { ReviewActions } from "@/components/program/review/reviews";
+import { ThreadActions } from "@/components/program/threads/threads-actions";
+import { ThreadList } from "@/components/program/threads/threads-list";
 
 interface BookDetailPageProps {
-  params: { id: number };
+  params: { id: string };
 }
 
 export default async function BookDetailPage({ params }: BookDetailPageProps) {
@@ -63,7 +65,14 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
             </p>
           </div>
 
-          <ProgressActions bookId={bookData.id} /> 
+          <div className="flex flex-col sm:flex-row gap-4 mt-6 items-center">
+            <div>
+              <ProgressActions bookId={bookData.id} />
+            </div>
+            <div>
+              <ReviewActions bookId={bookData.id} />
+            </div>
+          </div>
         </div>
 
         <aside className="lg:col-span-2 bg-slate-100 p-6 sm:p-8 rounded-2xl shadow-inner text-center mt-4">
@@ -78,7 +87,9 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
               />
             ))}
           </div>
-          <p className="text-sm text-gray-600 mb-5">Média com base em 737 avaliações</p>
+          <p className="text-sm text-gray-600 mb-5">
+            Média com base em 737 avaliações
+          </p>
           <Button
             variant="outline"
             className="w-full sm:w-64 mx-auto flex gap-2 items-center justify-center rounded-lg hover:scale-105 transition-all"
@@ -87,6 +98,19 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
             Avaliar este livro
           </Button>
         </aside>
+
+        <div className="lg:col-span-2 mt-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">
+              Discussões
+            </h2>
+            <ThreadActions bookId={bookData.id} />
+          </div>
+
+          <div className="bg-gradient-to-br from-white via-slate-50 to-white border border-gray-200 rounded-2xl shadow-lg p-6 space-y-6">
+            <ThreadList bookId={bookData.id} />
+          </div>
+        </div>
       </div>
     </main>
   );

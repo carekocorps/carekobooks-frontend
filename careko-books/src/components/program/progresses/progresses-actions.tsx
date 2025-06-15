@@ -1,12 +1,25 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Check, Heart } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProgressService } from "@/services/progress.service";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { toast } from "sonner";
+import { BookProgress, CreateBookProgress, UpdateBookProgress } from "@/types/bookProgress";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 interface Props {
   bookId: number;
@@ -15,72 +28,227 @@ interface Props {
 export function ProgressActions({ bookId }: Props) {
   const router = useRouter();
   const { user } = useCurrentUser();
-  const [loading, setLoading] = useState("");
+  const [existingProgress, setExistingProgress] = useState<BookProgress | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState<CreateBookProgress | UpdateBookProgress>({
+    status: "PLANS_TO_READ",
+    isFavorite: false,
+    score: 0,
+    pageCount: 0,
+    username: user?.username || "",
+    bookId: bookId,
+  });
 
-  if (!user) return null;
-
-  const handleClick = async (
-    type: "READING" | "FINISHED" | "FAVORITE"
-  ) => {
-    try {
-      setLoading(type);
-      await ProgressService.createProgress({
-        status:
-          type === "FAVORITE"
-            ? "PLANS_TO_READ"
-            : type,
-        isFavorite: type === "FAVORITE",
-        score: type === "FINISHED" ? 100 : 0,
-        pageCount: 0,
-        username: user.username,
-        bookId,
-      });
-
+  // Busca o progresso existente
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!user?.username) return;
       
-      const messages = {
-        READING: "Livro marcado como 'Quero Ler'",
-        FINISHED: "Livro marcado como 'Já Li'",
-        FAVORITE: "Livro adicionado aos favoritos",
-      };
-      toast.success(messages[type]);
+      try {
+        setIsLoading(true);
+        const progresses = await ProgressService.searchProgresses({
+          username: user.username,
+          bookId,
+          pageSize: 1,
+        });
+        
+        if (progresses.length > 0) {
+          setExistingProgress(progresses[0]);
+          setFormData({
+            ...progresses[0],
+            id: progresses[0].id,
+            username: user.username,
+            bookId: bookId,
+          });
+        } else {
+          setExistingProgress(null);
+          setFormData({
+            status: "PLANS_TO_READ",
+            isFavorite: false,
+            score: 0,
+            pageCount: 0,
+            username: user.username,
+            bookId: bookId,
+          });
+        }
+      } catch (err) {
+        console.error("Erro ao buscar progresso", err);
+        toast.error("Não foi possível verificar seu progresso");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
+    if (user?.username) {
+      fetchProgress();
+    }
+  }, [user, bookId]);
+
+  const handleInputChange = (field: keyof typeof formData, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!user?.username) {
+      toast.error("Usuário não autenticado");
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      
+      const submissionData = {
+        ...formData,
+        username: user.username,
+        bookId: bookId,
+      };
+
+      if (existingProgress) {
+        await ProgressService.updateProgress(
+          existingProgress.id, 
+          submissionData as UpdateBookProgress
+        );
+        toast.success("Progresso atualizado com sucesso!");
+      } else {
+        await ProgressService.createProgress(
+          submissionData as CreateBookProgress
+        );
+        toast.success("Progresso criado com sucesso!");
+      }
+      
+      setIsModalOpen(false);
       router.refresh();
     } catch (err) {
-      console.error("Erro ao criar progresso", err);
-      toast.error("Ocorreu um erro ao salvar o progresso.");
+      console.error("Erro ao salvar progresso", err);
+      toast.error("Ocorreu um erro ao salvar o progresso");
     } finally {
-      setLoading("");
+      setIsSubmitting(false);
     }
   };
 
+  if (!user || isLoading) return null;
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-      <Button
-        onClick={() => handleClick("READING")}
-        disabled={loading === "READING"}
-        className="bg-blue-600 hover:bg-blue-700 text-white py-5 text-base rounded-xl transition-all duration-200 hover:scale-[1.02]"
-      >
-        {loading === "READING" ? "Salvando..." : "Quero Ler"}
-      </Button>
+    <div>
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogTrigger asChild>
+          <Button className="w-full py-5 text-base rounded-xl">
+            {existingProgress ? (
+              <div className="flex items-center gap-2">
+                <Pencil className="w-4 h-4" />
+                Atualizar Progresso
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Plus className="w-4 h-4" />
+                Criar Progresso
+              </div>
+            )}
+          </Button>
+        </DialogTrigger>
+        
+        <DialogContent 
+          className="sm:max-w-md"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle>
+              {existingProgress ? "Atualizar Progresso" : "Criar Progresso"}
+            </DialogTitle>
+            <DialogDescription>
+              Informe seu progresso de leitura, incluindo status, nota e páginas lidas.
+            </DialogDescription>
+        </DialogHeader>
+          
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(v) => handleInputChange("status", v)}
+                  onOpenChange={(open) => {
+                    if (!open) {
+                      setTimeout(() => {
+                        const firstInput = document.querySelector('input');
+                        firstInput?.focus();
+                      }, 50);
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PLANS_TO_READ">Planejo Ler</SelectItem>
+                    <SelectItem value="READING">Lendo</SelectItem>
+                    <SelectItem value="FINISHED">Finalizado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-      <Button
-        onClick={() => handleClick("FINISHED")}
-        disabled={loading === "FINISHED"}
-        className="bg-emerald-600 hover:bg-emerald-700 text-white py-5 text-base flex gap-2 items-center justify-center rounded-xl transition-all duration-200 hover:scale-[1.02]"
-      >
-        <Check className="w-5 h-5" />
-        {loading === "FINISHED" ? "Salvando..." : "Já Li"}
-      </Button>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="favorite"
+                  checked={formData.isFavorite}
+                  onCheckedChange={(v) => handleInputChange("isFavorite", v)}
+                />
+                <Label htmlFor="favorite">Favorito</Label>
+              </div>
 
-      <Button
-        onClick={() => handleClick("FAVORITE")}
-        disabled={loading === "FAVORITE"}
-        variant="destructive"
-        className="py-5 text-base flex gap-2 items-center justify-center rounded-xl transition-all duration-200 hover:scale-[1.02]"
-      >
-        <Heart className="w-5 h-5" />
-        {loading === "FAVORITE" ? "Salvando..." : "Favoritar"}
-      </Button>
+              <div className="space-y-2">
+                <Label htmlFor="score">Nota (0-100)</Label>
+                <Input
+                  id="score"
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={formData.score}
+                  onChange={(e) => handleInputChange("score", parseInt(e.target.value) || 0)}
+                  onFocus={(e) => e.target.select()}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="pageCount">Páginas Lidas</Label>
+                <Input
+                  id="pageCount"
+                  type="number"
+                  min="0"
+                  value={formData.pageCount}
+                  onChange={(e) => handleInputChange("pageCount", parseInt(e.target.value) || 0)}
+                  onFocus={(e) => e.target.select()}
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-2">
+              <Button 
+                type="button"
+                variant="outline" 
+                onClick={() => setIsModalOpen(false)}
+                disabled={isSubmitting}
+              >
+                Cancelar
+              </Button>
+              <Button 
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Salvando..." : "Salvar Progresso"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

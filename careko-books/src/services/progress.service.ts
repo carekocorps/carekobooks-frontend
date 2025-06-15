@@ -7,11 +7,24 @@ export const ProgressService = {
     return res.data;
   },
 
-  getProgressByUserAndBook: async (username: string, bookId: number) => {
-    const res = await api.get<BookProgress>(`/api/v1/books/${bookId}/progress`, {
-      params: { username },
-    });
-    return res.data;
+  searchProgresses: async (params: {
+    username?: string;
+    bookId?: number;
+    status?: string;
+    isFavorite?: boolean;
+    score?: number;
+    pageCount?: number;
+    pageSize?: number;
+    pageNumber?: number;
+    orderBy?: string;
+    isAscendingOrder?: boolean;
+  }) => {
+    const res = await api.get<{
+      content: BookProgress[];
+      totalPages: number;
+      totalElements: number;
+    }>("/api/v1/books/progresses", { params });
+    return res.data.content;
   },
 
   updateProgress: async (id: number, data: UpdateBookProgress) => {
@@ -33,4 +46,18 @@ export const ProgressService = {
     const res = await api.delete<BookProgress>(`/api/v1/books/progresses/${id}/favorites`);
     return res.data;
   },
+
+  getProgressById: async (id: number) => {
+    const res = await api.get<BookProgress>(`/api/v1/books/progresses/${id}`);
+    return res.data;
+  },
+
+  getProgressByUserAndBook: async (username: string, bookId: number) => {
+    const progresses = await ProgressService.searchProgresses({
+      username,
+      bookId,
+      pageSize: 1
+    });
+    return progresses.length > 0 ? progresses[0] : null;
+  }
 };

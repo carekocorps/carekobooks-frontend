@@ -37,13 +37,6 @@ export default function ViewUserProfile() {
 
     fetchInitialActivities();
 
-    wsRef.current = ActivityService.connectWebSocket(
-      user.username,
-      (newActivity) => {
-        setActivities(prev => [newActivity, ...prev.slice(0, 9)]);
-      }
-    );
-
     return () => {
       if (wsRef.current) {
         wsRef.current.close();

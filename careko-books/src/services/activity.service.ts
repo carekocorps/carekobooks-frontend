@@ -39,32 +39,4 @@ export const ActivityService = {
     
     return ws;
   },
-  
-  connectWebSocket(username: string, callback: (activity: BookActivity) => void): WebSocket {
-    if (!process.env.NEXT_PUBLIC_WS_URL) {
-      throw new Error("WebSocket URL not configured");
-    }
-    
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL}/activities?username=${username}`;
-    const ws = new WebSocket(wsUrl);
-    
-    ws.onopen = () => {
-      console.log("WebSocket connection established");
-    };
-    
-    ws.onmessage = (event) => {
-      try {
-        const activity = JSON.parse(event.data) as BookActivity;
-        callback(activity);
-      } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
-      }
-    };
-    
-    ws.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
-    
-    return ws;
-  }
 };
