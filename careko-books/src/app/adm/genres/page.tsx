@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 
 import GenreCard from "@/components/program/genre/genre-card";
-import { PaginationDemo } from "@/components/program/pagination-demo";
+import { PaginationDemo } from "@/components/program/utils/pagination-demo";
 import { useGenreQueries } from "@/hooks/useGenreQueries";
 import CreateGenreModal from "@/components/program/genre/create-genre-modal";
 import { Button } from "@/components/ui/button";

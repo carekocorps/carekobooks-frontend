@@ -1,7 +1,7 @@
 "use client";
 
-import Banner from "@/components/program/banners";
-import Activity from "@/components/program/activity";
+
+import Activity from "@/components/program/activity/activity";
 import BookSection from "@/components/program/book/book-section";
 import { useQueries } from "@/hooks/useQueries";
 import { BookActivity, ActivityFilterParams } from "@/types/activity";
@@ -11,6 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ActivityService } from "@/services/activity.service";
 import { useStatusProgresses } from "@/hooks/useStatusProgresses";
 import { Book } from "lucide-react";
+import Banner from "@/components/program/layout/banners";
 
 export default function HomeContent() {
   const { books: recentBooks, loading } = useQueries({

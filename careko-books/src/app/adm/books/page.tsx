@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PaginationDemo } from "@/components/program/pagination-demo";
+import { PaginationDemo } from "@/components/program/utils/pagination-demo";
 import Book from "@/components/program/book/book";
 import { useQueries } from "@/hooks/useQueries";
 import CarouselBooks from "@/components/program/book/books-carousel";

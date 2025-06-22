@@ -4,9 +4,7 @@ import { Tilt_Neon, Tilt_Warp } from "next/font/google";
 import "./globals.css";
 import { Avatar } from "@/components/ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
-import NavBar from "@/components/program/nav-bar";
-import Dropdown from "@/components/program/dropdown";
-import SearchBar from "@/components/program/search-bar";
+
 import { NuqsAdapter } from "nuqs/adapters/next";
 import Link from "next/link";
 import { Toaster } from "sonner";
@@ -15,6 +13,9 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import NavBar from "@/components/program/layout/nav-bar";
+import SearchBar from "@/components/program/layout/search-bar";
+import Dropdown from "@/components/program/layout/dropdown";
 
 const tiltNeon = Tilt_Neon({
   variable: "--font-tilt-neon",

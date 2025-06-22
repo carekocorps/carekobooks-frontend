@@ -1,9 +1,8 @@
 "use client";
 
-import FilterBar from "@/components/program/filter-bar";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PaginationDemo } from "@/components/program/pagination-demo";
+import { PaginationDemo } from "@/components/program/utils/pagination-demo";
 import Book from "@/components/program/book/book";
 import { useQueries } from "@/hooks/useQueries";
 import CarouselBooks from "@/components/program/book/books-carousel";
@@ -18,6 +17,7 @@ import {
 import { ArrowUp, ArrowDown } from "lucide-react";
 import UserCard from "@/components/program/user/user-card";
 import { useQueryState } from "nuqs";
+import FilterBar from "@/components/program/layout/filter-bar";
 
 export default function SearchResultsPage() {
   const {

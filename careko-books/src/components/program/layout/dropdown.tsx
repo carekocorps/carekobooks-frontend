@@ -11,6 +11,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sun, Moon } from "lucide-react";
+import Link from "next/link";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface DropdownProps {
   children: React.ReactNode;
@@ -18,6 +20,7 @@ interface DropdownProps {
 }
 
 export default function Dropdown({ children, onLogout }: DropdownProps) {
+  const { user } = useCurrentUser();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -45,7 +48,7 @@ export default function Dropdown({ children, onLogout }: DropdownProps) {
         <DropdownMenuLabel className="text-sm">Minha Conta</DropdownMenuLabel>
         <DropdownMenuSeparator className="my-2 border-gray-200 dark:border-gray-700" />
 
-        <a href="/user/profile">
+        <Link href={`/user/${user?.username}`}>
           <DropdownMenuItem className="
             flex items-center gap-2
             px-2 py-1 rounded-md
@@ -55,7 +58,7 @@ export default function Dropdown({ children, onLogout }: DropdownProps) {
             <i className="bi bi-person-fill text-lg text-zinc-600 dark:text-zinc-300" />
             Meu Perfil
           </DropdownMenuItem>
-        </a>
+        </Link>
         <DropdownMenuItem className="
           flex items-center gap-2
           px-2 py-1 rounded-md
