@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 
 const navItems = [
   { label: "Home", href: "/", icon: "bi-house" },
-  { label: "Seus Livros", href: "/books", icon: "bi-book" },
   { label: "Explorar", href: "/auth", icon: "bi-compass" },
   { label: "Dashboard", href: "/dashboard", icon: "bi-speedometer2" },
   { label: "Administrador", href: "/adm", icon: "bi-person-gear" },

@@ -59,25 +59,6 @@ export default function Dropdown({ children, onLogout }: DropdownProps) {
             Meu Perfil
           </DropdownMenuItem>
         </Link>
-        <DropdownMenuItem className="
-          flex items-center gap-2
-          px-2 py-1 rounded-md
-          hover:bg-zinc-100 dark:hover:bg-zinc-700
-          cursor-pointer
-        ">
-          <i className="bi bi-book-half text-lg text-zinc-600 dark:text-zinc-300" />
-          Meus Livros
-        </DropdownMenuItem>
-        <DropdownMenuItem className="
-          flex items-center gap-2
-          px-2 py-1 rounded-md
-          hover:bg-zinc-100 dark:hover:bg-zinc-700
-          cursor-pointer
-        ">
-          <i className="bi bi-gear-fill text-lg text-zinc-600 dark:text-zinc-300" />
-          Configurações
-        </DropdownMenuItem>
-
         <DropdownMenuSeparator className="my-2 border-gray-200 dark:border-gray-700" />
 
         <DropdownMenuItem asChild className="px-2 py-1">

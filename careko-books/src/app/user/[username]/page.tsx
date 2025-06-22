@@ -14,9 +14,10 @@ import ErrorState from "@/components/program/utils/error-state";
 import UserNotFoundState from "@/components/program/utils/user-not-found";
 import ActivityFeed from "@/components/program/activity/activity-feed";
 import FollowModal from "@/components/program/user/follow-modal";
+import ViewProgressTable from "@/components/program/progresses/progresses-table";
 
 
-export default function ViewOtherUserProfile() {
+export default function ViewUserProfile() {
   const params = useParams();
   const username = params.username as string;
   const currentUser = useCurrentUser().user; 
@@ -150,19 +151,25 @@ export default function ViewOtherUserProfile() {
 
   return (
     <main className="p-4 md:p-8 mx-auto flex justify-center">
-      <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6 mt-8 justify-center">
-        <ProfileHeader 
-          user={user}
-          isCurrentUser={isCurrentUserProfile}
-          isFollowing={isFollowing}
-          loadingFollow={loadingFollow}
-          onFollowClick={handleFollow}
-          onFollowersClick={handleOpenFollowers}
-          onFollowingClick={handleOpenFollowing}
-        />
+      <div className="w-full max-w-6xl flex-col lg:flex-row gap- mt-8 justify-center">
+        <div className="flex">
+            <ProfileHeader 
+            user={user}
+            isCurrentUser={isCurrentUserProfile}
+            isFollowing={isFollowing}
+            loadingFollow={loadingFollow}
+            onFollowClick={handleFollow}
+            onFollowersClick={handleOpenFollowers}
+            onFollowingClick={handleOpenFollowing}
+          />
 
-        <div className="w-full lg:w-2/5 space-y-6 mx-auto">
-          <ActivityFeed activities={activities} loading={loadingActivities} />
+          <div className="w-full lg:w-2/5 space-y-6 mx-auto">
+            <ActivityFeed activities={activities} loading={loadingActivities} />
+          </div>
+        </div>
+
+        <div id="livros" className="mt-6 scroll-mt-30">
+          <ViewProgressTable username={user.username}/>
         </div>
       </div>
 

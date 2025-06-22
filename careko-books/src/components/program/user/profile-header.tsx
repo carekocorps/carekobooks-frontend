@@ -84,7 +84,6 @@ export default function ProfileHeader({
 
           {isCurrentUser && (
             <div className="flex-col sm:flex-row gap-3 w-full max-w-xs justify-center">
-              <Button variant="outline" className="w-full">Configurações</Button>
               <Button className="w-full bg-blue-600 hover:bg-blue-700">Editar Perfil</Button>
             </div>
           )}
