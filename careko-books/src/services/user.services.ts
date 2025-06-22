@@ -1,6 +1,5 @@
 import { UserType } from "@/types/user";
 import api from "./api";
-import { CookieService } from "./cookies.service";
 
 
 export const UserService = {
@@ -20,6 +19,45 @@ export const UserService = {
 
   getUserByUsername: async (username: string): Promise<UserType> => {
     const response = await api.get(`/api/v1/users/${username}`);
+    return response.data;
+  },
+
+  updateUser: async (username: string, data: { 
+    username?: string; 
+    displayName?: string; 
+    description?: string;
+    image?: File | null;
+  }): Promise<UserType> => {
+    const formData = new FormData();
+    const userData = {
+      username: data.username,
+      displayName: data.displayName,
+      description: data.description
+    };
+    formData.append(
+      "request",
+      new Blob([JSON.stringify(userData)], { type: "application/json" })
+    );
+    if (data.image instanceof File) {
+      if (!data.image.type.match(/image\/(jpeg|png|gif|webp)/)) {
+        throw new Error("Apenas imagens JPEG, PNG, GIF ou WebP são permitidas");
+      }
+      formData.append("image", data.image, data.image.name);
+    } else {
+      formData.append(
+        "image", 
+        new Blob([], { type: "image/png" }), 
+        "empty.png"
+      );
+    }
+
+    const response = await api.put(`/api/v1/users/${username}`, formData, {
+      headers: {
+        'Content-Type': undefined
+      },
+      transformRequest: (data) => data,
+    });
+
     return response.data;
   },
 };

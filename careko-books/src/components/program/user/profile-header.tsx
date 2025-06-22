@@ -1,6 +1,7 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserType } from "@/types/user";
+import UpdateUserModal from "./edit-profile-modal";
 
 interface ProfileHeaderProps {
   user: UserType;
@@ -10,6 +11,7 @@ interface ProfileHeaderProps {
   onFollowClick: () => void;
   onFollowersClick: () => void;
   onFollowingClick: () => void;
+  onProfileUpdated?: () => void; 
 }
 
 export default function ProfileHeader({
@@ -20,6 +22,7 @@ export default function ProfileHeader({
   onFollowClick,
   onFollowersClick,
   onFollowingClick,
+  onProfileUpdated, 
 }: ProfileHeaderProps) {
   return (
     <div className="bg-white dark:bg-gray-900 shadow-lg w-full lg:w-2/5 rounded-2xl relative overflow-visible flex flex-col items-center gap-5 pt-24 pb-8 px-6 border border-gray-100 dark:border-gray-800 mx-auto">
@@ -84,7 +87,14 @@ export default function ProfileHeader({
 
           {isCurrentUser && (
             <div className="flex-col sm:flex-row gap-3 w-full max-w-xs justify-center">
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">Editar Perfil</Button>
+              <UpdateUserModal 
+                username={user.username}
+                onSuccess={onProfileUpdated}
+              >
+                <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                  Editar Perfil
+                </Button>
+              </UpdateUserModal>
             </div>
           )}
         </div>

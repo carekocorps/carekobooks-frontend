@@ -57,6 +57,10 @@ export default function ViewUserProfile() {
     }
   };
 
+  const handleProfileUpdated = () => {
+    fetchUserData(); 
+  };
+
   const fetchFollowData = async () => {
     try {
       const response = modalOpen === "seguidores" 
@@ -154,13 +158,14 @@ export default function ViewUserProfile() {
       <div className="w-full max-w-6xl flex-col lg:flex-row gap- mt-8 justify-center">
         <div className="flex">
             <ProfileHeader 
-            user={user}
-            isCurrentUser={isCurrentUserProfile}
-            isFollowing={isFollowing}
-            loadingFollow={loadingFollow}
-            onFollowClick={handleFollow}
-            onFollowersClick={handleOpenFollowers}
-            onFollowingClick={handleOpenFollowing}
+               user={user}
+              isCurrentUser={isCurrentUserProfile}
+              isFollowing={isFollowing}
+              loadingFollow={loadingFollow}
+              onFollowClick={handleFollow}
+              onFollowersClick={handleOpenFollowers}
+              onFollowingClick={handleOpenFollowing}
+              onProfileUpdated={handleProfileUpdated}
           />
 
           <div className="w-full lg:w-2/5 space-y-6 mx-auto">
