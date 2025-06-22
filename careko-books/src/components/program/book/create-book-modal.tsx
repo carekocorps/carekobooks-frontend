@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "../../ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger
+} from "../../ui/dialog";
 import { Button } from "../../ui/button";
 import { BookService } from "@/services/books.service";
 import { Input } from "../../ui/input";
@@ -72,8 +79,8 @@ export default function CreateBookModal() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-2xl rounded-lg">
-        <DialogHeader className="border-b pb-4">
+      <DialogContent className="max-w-2xl rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+        <DialogHeader className="border-b pb-4 dark:border-zinc-700">
           <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
             <i className="bi bi-book-plus"></i>
             <span>Adicionar Novo Livro</span>
@@ -94,7 +101,7 @@ export default function CreateBookModal() {
                 onChange={handleChange}
                 placeholder="Digite o título completo"
                 required
-                className="border-gray-300 focus:border-primary"
+                className="border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:placeholder-zinc-400"
               />
             </div>
 
@@ -110,7 +117,7 @@ export default function CreateBookModal() {
                 onChange={handleChange}
                 placeholder="Nome completo do autor"
                 required
-                className="border-gray-300 focus:border-primary"
+                className="border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:placeholder-zinc-400"
               />
             </div>
 
@@ -126,7 +133,7 @@ export default function CreateBookModal() {
                 onChange={handleChange}
                 placeholder="Nome da editora"
                 required
-                className="border-gray-300 focus:border-primary"
+                className="border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:placeholder-zinc-400"
               />
             </div>
           </div>
@@ -144,7 +151,7 @@ export default function CreateBookModal() {
                 value={formData.publishedAt}
                 onChange={handleChange}
                 required
-                className="border-gray-300 focus:border-primary"
+                className="border-gray-300 dark:border-zinc-700 dark:bg-zinc-800"
               />
             </div>
 
@@ -162,7 +169,7 @@ export default function CreateBookModal() {
                 onChange={handleChange}
                 placeholder="Ex: 256"
                 required
-                className="border-gray-300 focus:border-primary"
+                className="border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:placeholder-zinc-400"
               />
             </div>
 
@@ -176,9 +183,11 @@ export default function CreateBookModal() {
                 value={formData.genres.join(", ")}
                 onChange={handleGenresChange}
                 placeholder="Separe por vírgulas (Ex: Ficção, Aventura, Romance)"
-                className="border-gray-300 focus:border-primary"
+                className="border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:placeholder-zinc-400"
               />
-              <p className="text-xs text-muted-foreground">Máximo de 3 gêneros recomendados</p>
+              <p className="text-xs text-muted-foreground dark:text-zinc-400">
+                Máximo de 3 gêneros recomendados
+              </p>
             </div>
           </div>
 
@@ -195,12 +204,14 @@ export default function CreateBookModal() {
               placeholder="Descreva brevemente o enredo do livro"
               required
               rows={4}
-              className="border-gray-300 focus:border-primary"
+              className="border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:placeholder-zinc-400"
             />
-            <p className="text-xs text-muted-foreground">Mínimo de 100 caracteres</p>
+            <p className="text-xs text-muted-foreground dark:text-zinc-400">
+              Mínimo de 100 caracteres
+            </p>
           </div>
 
-          <Separator className="md:col-span-2 my-2" />
+          <Separator className="md:col-span-2 my-2 dark:bg-zinc-700" />
 
           <DialogFooter className="md:col-span-2 flex justify-end gap-3">
             <Button
@@ -208,14 +219,14 @@ export default function CreateBookModal() {
               variant="outline"
               onClick={() => setIsOpen(false)}
               disabled={loading}
-              className="border-gray-300 hover:bg-gray-100 min-w-24"
+              className="border-gray-300 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700 min-w-24"
             >
               Cancelar
             </Button>
             <Button
               type="submit"
               disabled={loading}
-              className="bg-primary hover:bg-primary/90 min-w-24 flex items-center gap-2"
+              className="bg-primary hover:bg-primary/90 text-white dark:text-white min-w-24 flex items-center gap-2"
             >
               {loading ? (
                 <>

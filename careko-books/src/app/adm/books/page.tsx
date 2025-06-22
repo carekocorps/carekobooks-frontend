@@ -12,7 +12,7 @@ import { PaginationDemo } from "@/components/program/pagination-demo";
 import Book from "@/components/program/book/book";
 import { useQueries } from "@/hooks/useQueries";
 import CarouselBooks from "@/components/program/book/books-carousel";
-import { SkeletonCard } from "@/components/program/skeleton-card";
+import { SkeletonCard } from "@/components/program/book/skeleton-card";
 import CreateBookModal from "@/components/program/book/create-book-modal";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";

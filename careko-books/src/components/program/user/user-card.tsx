@@ -1,7 +1,8 @@
 import { UserType } from "@/types/user";
-import { Avatar, AvatarImage } from "../ui/avatar";
+
 import { BsShieldLockFill } from "react-icons/bs";
 import Link from "next/link";
+import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 
 interface UserProps {
   user: UserType;
@@ -10,7 +11,7 @@ interface UserProps {
 export default function UserCard({ user }: UserProps) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-3xl w-52 min-h-64 p-6 shadow-xl hover:shadow-2xl transition-shadow flex flex-col items-center justify-center gap-4 border border-gray-200 dark:border-gray-700">
-      <Avatar className="w-20 h-20 border-4 border-gray-300 dark:border-gray-600 shadow-sm">
+      <Avatar className="w-20 h-20  border-gray-300 dark:border-gray-600 shadow-sm">
         <AvatarImage
           src={user.image?.url || "/default-avatar.png"}
           alt="Imagem de avatar"

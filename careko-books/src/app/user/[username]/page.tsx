@@ -38,7 +38,6 @@ export default function ViewOtherUserProfile() {
         const userData = await UserService.getUserByUsername(username);
         setUser(userData);
 
-        // Verifica se o usuário logado segue o perfil visualizado
         if (currentUser?.username !== username) {
           const response = await UserSocialService.getFollowing(currentUser?.username ?? "", { pageSize: 100 });
           const seguidos = response.data.content;
@@ -255,12 +254,6 @@ export default function ViewOtherUserProfile() {
             </div>
           </div>
           
-          <div className="bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center">
-              Estatísticas de Leitura
-            </h2>
-
-          </div>
         </div>
       </div>
 

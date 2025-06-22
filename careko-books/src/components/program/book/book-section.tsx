@@ -4,7 +4,7 @@ import { BookType } from "@/types/book";
 import CarouselBooks from "@/components/program/book/books-carousel";
 import { Separator } from "@/components/ui/separator";
 import Book from "@/components/program/book/book";
-import { SkeletonCard } from "../skeleton-card";
+import { SkeletonCard } from "./skeleton-card";
 
 type Props = {
   title: string;

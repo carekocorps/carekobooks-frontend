@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useQueryClient } from "@tanstack/react-query";
 import { ActivityService } from "@/services/activity.service";
+import { useStatusProgresses } from "@/hooks/useStatusProgresses";
+import { Book } from "lucide-react";
 
 export default function HomeContent() {
   const { books: recentBooks, loading } = useQueries({
@@ -18,6 +20,16 @@ export default function HomeContent() {
   const { books } = useQueries();
 
   const { user } = useCurrentUser();
+  const { 
+      count, 
+      progresses, 
+      loading: progressLoading, 
+      error: progressError,
+      totalPages
+    } = useStatusProgresses({
+      username: user?.username,
+      status: "READING"
+    });
   const [followedActivities, setFollowedActivities] = useState<BookActivity[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
   const [wsError, setWsError] = useState<string | null>(null);
@@ -171,7 +183,7 @@ export default function HomeContent() {
             <BookSection
               title="Continue Lendo"
               iconClass="bi bi-book-half text-teal-500 dark:text-teal-400"
-              books={books}
+              books={progresses.map(progress => progress.book)}
               loading={loading}
             />
           </div>

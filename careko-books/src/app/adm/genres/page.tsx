@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SkeletonCard } from "@/components/program/skeleton-card";
+
 import GenreCard from "@/components/program/genre/genre-card";
 import { PaginationDemo } from "@/components/program/pagination-demo";
 import { useGenreQueries } from "@/hooks/useGenreQueries";
@@ -16,6 +16,7 @@ import CreateGenreModal from "@/components/program/genre/create-genre-modal";
 import { Button } from "@/components/ui/button";
 import { GenreService } from "@/services/genre.service";
 import { toast } from "sonner";
+import { SkeletonGenreCard } from "@/components/program/genre/skeleton-genre";
 
 export default function Genres() {
   const {
@@ -124,7 +125,7 @@ export default function Genres() {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {[...Array(8)].map((_, idx) => (
-              <SkeletonCard key={idx} />
+              <SkeletonGenreCard key={idx} />
             ))}
           </div>
         ) : genres.length === 0 ? (

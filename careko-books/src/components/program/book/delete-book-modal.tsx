@@ -39,18 +39,20 @@ export default function DeleteBookModal({ bookId, onDeleted }: DeleteBookModalPr
         <Button
           variant="ghost"
           aria-label="Excluir livro"
-          className="w-8 h-8 rounded-md border border-red-400 bg-red-100 text-red-700 p-0
-                     flex items-center justify-center shadow-sm
-                     transform transition-transform duration-200 hover:scale-105 hover:bg-red-200"
+          className="w-8 h-8 rounded-md border border-red-400 bg-red-100 text-red-700 
+                     dark:border-red-600 dark:bg-red-950 dark:text-red-300
+                     p-0 flex items-center justify-center shadow-sm 
+                     transform transition-transform duration-200 hover:scale-105 
+                     hover:bg-red-200 dark:hover:bg-red-800/30"
         >
           <i className="bi bi-trash text-base"></i>
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="dark:bg-zinc-900 dark:text-zinc-100">
         <DialogHeader>
           <DialogTitle>Tem certeza que deseja excluir?</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="dark:text-zinc-400">
             Esta ação é irreversível. O livro será permanentemente removido.
           </DialogDescription>
         </DialogHeader>
@@ -60,7 +62,8 @@ export default function DeleteBookModal({ bookId, onDeleted }: DeleteBookModalPr
             variant="outline"
             onClick={() => setIsOpen(false)}
             disabled={isDeleting}
-            className="border-gray-300 text-gray-700 hover:bg-gray-100"
+            className="border-gray-300 text-gray-700 hover:bg-gray-100 
+                       dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
           >
             Cancelar
           </Button>
@@ -69,7 +72,8 @@ export default function DeleteBookModal({ bookId, onDeleted }: DeleteBookModalPr
             variant="destructive"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="bg-red-600 text-white hover:bg-red-700"
+            className="bg-red-600 text-white hover:bg-red-700 
+                       dark:bg-red-700 dark:hover:bg-red-800"
           >
             {isDeleting ? (
               <>

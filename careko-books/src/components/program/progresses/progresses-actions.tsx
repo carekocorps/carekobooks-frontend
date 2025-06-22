@@ -3,11 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { ProgressService } from "@/services/progress.service";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { toast } from "sonner";
-import { BookProgress, CreateBookProgress, UpdateBookProgress } from "@/types/bookProgress";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +16,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useProgress } from "@/hooks/useProgresses";
 
 interface Props {
   bookId: number;
@@ -28,129 +26,42 @@ interface Props {
 export function ProgressActions({ bookId }: Props) {
   const router = useRouter();
   const { user } = useCurrentUser();
-  const [existingProgress, setExistingProgress] = useState<BookProgress | null>(null);
+  const username = user?.username;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    status: "PLANS_TO_READ" as "PLANS_TO_READ" | "READING" | "FINISHED",
-    isFavorite: false,
-    score: 0,
-    pageCount: 0,
-  });
 
-  useEffect(() => {
-    const fetchProgress = async () => {
-      if (!user?.username) return;
-      try {
-        setIsLoading(true);
-        const response = await ProgressService.getProgresses(
-          1, 
-          1, 
-          'createdAt',
-          false, 
-          { username: user.username, bookId } 
-        );
-        
-        if (response.content.length > 0) {
-          const progress = response.content[0];
-          setExistingProgress(progress);
-          setFormData({
-            status: progress.status,
-            isFavorite: progress.isFavorite,
-            score: progress.score,
-            pageCount: progress.pageCount,
-          });
-        } else {
-          setExistingProgress(null);
-          setFormData({
-            status: "PLANS_TO_READ",
-            isFavorite: false,
-            score: 0,
-            pageCount: 0,
-          });
-        }
-      } catch (err) {
-        console.error("Erro ao buscar progresso", err);
-        toast.error("Não foi possível verificar seu progresso");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const {
+    existingProgress,
+    formData,
+    isLoading: isProgressLoading,
+    isSubmitting,
+    handleInputChange,
+    handleSubmit: submitProgress,
+    resetForm,
+  } = useProgress({ bookId, username });
 
-    if (user?.username) {
-      fetchProgress();
-    }
-  }, [user, bookId]);
-
-  const handleInputChange = (field: keyof typeof formData, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!user?.username) {
-      toast.error("Usuário não autenticado");
-      return;
-    }
-    
     try {
-      setIsSubmitting(true);
-      
-      const payload = {
-        ...formData,
-        username: user.username,
-        bookId: bookId,
-      };
-
-      if (existingProgress) {
-        await ProgressService.updateProgress(existingProgress.id, {
-          ...payload,
-          id: existingProgress.id
-        } as UpdateBookProgress);
-        toast.success("Progresso atualizado com sucesso!");
-      } else {
-        await ProgressService.createProgress(payload as CreateBookProgress);
-        toast.success("Progresso criado com sucesso!");
-      }
-      
-      
+      await submitProgress();
       setIsModalOpen(false);
       router.refresh();
-    } catch (err: any) {
-      console.error("Erro ao salvar progresso", err);
-      
-      if (err.response?.status === 409) {
-        toast.error(
-          "Não é possível atualizar o progresso pois ele já foi finalizado",
-          {
-            description: "Progressos finalizados não podem ser alterados",
-            action: {
-              label: "Entendi",
-              onClick: () => {}
-            }
-          }
-        );
-      } else {
-        toast.error("Ocorreu um erro ao salvar o progresso");
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+    } catch (error) {}
   };
 
-  if (!user || isLoading) return null;
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    if (!existingProgress) resetForm();
+  };
+
+  if (!user || isProgressLoading) return null;
 
   return (
     <div>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogTrigger asChild>
-          <Button className="w-full py-5 text-base rounded-xl">
+          <Button
+            className="w-full py-5 text-base rounded-xl border border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
             {existingProgress ? (
               <div className="flex items-center gap-2">
                 <Pencil className="w-4 h-4" />
@@ -164,11 +75,13 @@ export function ProgressActions({ bookId }: Props) {
             )}
           </Button>
         </DialogTrigger>
-        
-        <DialogContent 
+
+        <DialogContent
           className="sm:max-w-md"
           onOpenAutoFocus={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}
+          onEscapeKeyDown={handleCloseModal}
+          onInteractOutside={handleCloseModal}
         >
           <DialogHeader>
             <DialogTitle>
@@ -178,8 +91,8 @@ export function ProgressActions({ bookId }: Props) {
               Informe seu progresso de leitura, incluindo status, nota e páginas lidas.
             </DialogDescription>
           </DialogHeader>
-          
-          <form onSubmit={handleSubmit}>
+
+          <form onSubmit={handleFormSubmit}>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
@@ -230,20 +143,17 @@ export function ProgressActions({ bookId }: Props) {
                 />
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-2">
-              <Button 
+              <Button
                 type="button"
-                variant="outline" 
-                onClick={() => setIsModalOpen(false)}
+                variant="outline"
+                onClick={handleCloseModal}
                 disabled={isSubmitting}
               >
                 Cancelar
               </Button>
-              <Button 
-                type="submit"
-                disabled={isSubmitting}
-              >
+              <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Salvando..." : "Salvar Progresso"}
               </Button>
             </div>

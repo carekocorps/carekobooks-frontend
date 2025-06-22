@@ -87,8 +87,8 @@ export default function UpdateGenreModal({ name }: UpdateGenreModalProps) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-2xl rounded-lg">
-        <DialogHeader className="border-b pb-4">
+      <DialogContent className="max-w-2xl rounded-lg bg-white text-black dark:bg-zinc-900 dark:text-white">
+        <DialogHeader className="border-b pb-4 border-gray-200 dark:border-zinc-700">
           <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
             <i className="bi bi-tags"></i>
             <span>Editar Gênero</span>
@@ -97,7 +97,7 @@ export default function UpdateGenreModal({ name }: UpdateGenreModalProps) {
 
         {loadingData ? (
           <div className="flex justify-center items-center h-32">
-            <p>Carregando dados do gênero...</p>
+            <p className="text-muted-foreground dark:text-zinc-400">Carregando dados do gênero...</p>
           </div>
         ) : (
           <form onSubmit={handleUpdate} className="grid grid-cols-1 gap-6 py-4">
@@ -117,7 +117,7 @@ export default function UpdateGenreModal({ name }: UpdateGenreModalProps) {
                   onChange={handleChange}
                   placeholder="Ex: fiction"
                   required
-                  className="border-gray-300 focus:border-primary"
+                  className="border-gray-300 focus:border-primary dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                 />
               </div>
 
@@ -136,7 +136,7 @@ export default function UpdateGenreModal({ name }: UpdateGenreModalProps) {
                   onChange={handleChange}
                   placeholder="Ex: Ficção"
                   required
-                  className="border-gray-300 focus:border-primary"
+                  className="border-gray-300 focus:border-primary dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                 />
               </div>
 
@@ -155,15 +155,15 @@ export default function UpdateGenreModal({ name }: UpdateGenreModalProps) {
                   onChange={handleChange}
                   placeholder="Descreva o gênero (opcional)"
                   rows={4}
-                  className="border-gray-300 focus:border-primary"
+                  className="border-gray-300 focus:border-primary dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground dark:text-zinc-400">
                   Máximo de 500 caracteres
                 </p>
               </div>
             </div>
 
-            <Separator className="my-2" />
+            <Separator className="my-2 dark:bg-zinc-700" />
 
             <DialogFooter className="flex justify-end gap-3">
               <Button
@@ -171,7 +171,7 @@ export default function UpdateGenreModal({ name }: UpdateGenreModalProps) {
                 variant="outline"
                 onClick={() => setIsOpen(false)}
                 disabled={loading}
-                className="border-gray-300 hover:bg-gray-100 min-w-24"
+                className="border-gray-300 hover:bg-gray-100 dark:border-zinc-600 dark:hover:bg-zinc-700 dark:text-white min-w-24"
               >
                 Cancelar
               </Button>

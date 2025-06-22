@@ -1,22 +1,34 @@
 import { ProgressService } from '@/services/progress.service';
 import { useState, useEffect } from 'react';
+import { BookProgress } from '@/types/bookProgress'; 
 
-type ProgressStatus = "PLANS_TO_READ" | "READING" | "FINISHED";
+export type ProgressStatus = "PLANS_TO_READ" | "READING" | "FINISHED";
 
-interface useStatusProps{
-  username: string | null | undefined,
-  status: ProgressStatus
+interface UseStatusProgressesOptions {
+  username: string | null | undefined;
+  status: ProgressStatus;
+  page?: number;
+  perPage?: number;
 }
 
-export const useStatusProgresses = ({username, status}: useStatusProps) => {
+export const useStatusProgresses = ({
+  username,
+  status,
+  page = 1,
+  perPage = 12
+}: UseStatusProgressesOptions) => {
   const [count, setCount] = useState<number>(0);
+  const [progresses, setProgresses] = useState<BookProgress[]>([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState<number>(0);
 
   useEffect(() => {
     if (!username) {
       setLoading(false);
       setCount(0);
+      setProgresses([]);
+      setTotalPages(0);
       return;
     }
 
@@ -26,10 +38,10 @@ export const useStatusProgresses = ({username, status}: useStatusProps) => {
         setError(null);
         
         const response = await ProgressService.getProgresses(
-          1, 
-          1, 
+          page, 
+          perPage, 
           'createdAt',
-          false,
+          false,       
           { 
             username, 
             status 
@@ -37,6 +49,8 @@ export const useStatusProgresses = ({username, status}: useStatusProps) => {
         );
 
         setCount(response.pageable.totalElements);
+        setProgresses(response.content);
+        setTotalPages(Math.ceil(response.pageable.totalElements / response.pageable.pageSize));
       } catch (err: any) {
         setError(err.message || `Erro ao carregar progressos com status ${status}`);
         console.error(err);
@@ -46,7 +60,13 @@ export const useStatusProgresses = ({username, status}: useStatusProps) => {
     };
 
     fetchStatusProgresses();
-  }, [username, status]);
+  }, [username, status, page, perPage]); 
 
-  return { count, loading, error };
+  return { 
+    count, 
+    progresses, 
+    loading, 
+    error,
+    totalPages
+  };
 };

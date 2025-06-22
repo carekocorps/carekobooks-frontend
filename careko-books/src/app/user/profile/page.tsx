@@ -162,26 +162,6 @@ export default function ViewUserProfile() {
               )}
             </div>
           </div>
-          
-          <div className="bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center">
-              Estatísticas de Leitura
-            </h2>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                <p className="text-2xl font-bold">12</p>
-                <p className="text-sm">Livros lidos</p>
-              </div>
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                <p className="text-2xl font-bold">3,450</p>
-                <p className="text-sm">Páginas</p>
-              </div>
-              <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
-                <p className="text-2xl font-bold">7</p>
-                <p className="text-sm">Em progresso</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </main>

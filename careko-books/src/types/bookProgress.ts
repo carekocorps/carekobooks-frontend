@@ -1,3 +1,5 @@
+import { BookType } from "./book";
+
 export type ProgressResponse = {
   content: BookProgress[];
   pageable: {
@@ -15,6 +17,7 @@ export type BookProgress = {
   pageCount: number;
   username: string;
   bookId: number;
+  book: BookType;
 };
 
 export type CreateBookProgress = Omit<BookProgress, "id">;

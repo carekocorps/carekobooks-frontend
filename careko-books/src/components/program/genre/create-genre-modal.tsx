@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "../../ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "../../ui/dialog";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 import { Textarea } from "../../ui/textarea";
@@ -18,9 +25,9 @@ export default function CreateGenreModal() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -50,14 +57,14 @@ export default function CreateGenreModal() {
           aria-label="Criar novo gênero"
           className="w-8 h-8 rounded-md border border-primary bg-primary/10 text-primary p-0 
                      flex items-center justify-center shadow-sm 
-                     transform transition-transform duration-200 hover:scale-105 hover:bg-primary/20"
+                     transition-transform transform duration-200 hover:scale-105 hover:bg-primary/20"
         >
           <i className="bi bi-plus text-lg" aria-hidden="true"></i>
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-2xl rounded-lg">
-        <DialogHeader className="border-b pb-4">
+      <DialogContent className="max-w-2xl rounded-lg bg-white dark:bg-zinc-900 text-black dark:text-white">
+        <DialogHeader className="border-b border-gray-300 dark:border-zinc-700 pb-4">
           <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
             <i className="bi bi-tags"></i>
             <span>Adicionar Novo Gênero</span>
@@ -78,7 +85,7 @@ export default function CreateGenreModal() {
                 onChange={handleChange}
                 placeholder="Ex: fiction"
                 required
-                className="border-gray-300 focus:border-primary"
+                className="border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white focus:border-primary"
               />
             </div>
 
@@ -94,7 +101,7 @@ export default function CreateGenreModal() {
                 onChange={handleChange}
                 placeholder="Ex: Ficção"
                 required
-                className="border-gray-300 focus:border-primary"
+                className="border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white focus:border-primary"
               />
             </div>
 
@@ -111,13 +118,15 @@ export default function CreateGenreModal() {
                 placeholder="Descreva o gênero"
                 required
                 rows={4}
-                className="border-gray-300 focus:border-primary"
+                className="border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white focus:border-primary"
               />
-              <p className="text-xs text-muted-foreground">Mínimo de 50 caracteres</p>
+              <p className="text-xs text-muted-foreground dark:text-zinc-400">
+                Mínimo de 50 caracteres
+              </p>
             </div>
           </div>
 
-          <Separator className="my-2" />
+          <Separator className="my-2 dark:bg-zinc-700" />
 
           <DialogFooter className="flex justify-end gap-3">
             <Button
@@ -125,7 +134,7 @@ export default function CreateGenreModal() {
               variant="outline"
               onClick={() => setIsOpen(false)}
               disabled={loading}
-              className="border-gray-300 hover:bg-gray-100 min-w-24"
+              className="border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-700 min-w-24"
             >
               Cancelar
             </Button>
