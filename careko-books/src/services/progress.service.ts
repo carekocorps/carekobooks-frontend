@@ -1,33 +1,49 @@
-import { BookProgress, CreateBookProgress, UpdateBookProgress } from "@/types/bookProgress";
-import api from "./api";
+  import api from "./api";
+import { ProgressResponse, CreateBookProgress, UpdateBookProgress, BookProgress } from "@/types/bookProgress";
+
+interface ProgressFilters {
+  username?: string;
+  bookId?: number;
+  status?: "PLANS_TO_READ" | "READING" | "FINISHED";
+  isFavorite?: boolean;
+  score?: number;
+  pageCount?: number;
+  genre?: string;
+  createdBefore?: string;
+  createdAfter?: string;
+}
 
 export const ProgressService = {
+  getProgresses: async (
+    page = 1,
+    size = 10,
+    orderBy = 'createdAt',
+    isAscending = false,
+    filters: ProgressFilters = {}
+  ) => {
+    const cleanedFilters: Partial<ProgressFilters> = Object.fromEntries(
+      Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
+    ) as Partial<ProgressFilters>;
+
+    const response = await api.get<ProgressResponse>("/api/v1/books/progresses", {
+      params: {
+        pageNumber: page - 1,
+        pageSize: size,
+        orderBy,
+        isAscendingOrder: isAscending,
+        ...cleanedFilters,
+      },
+    });
+
+    return response.data;
+  },
+
   createProgress: async (data: CreateBookProgress) => {
-    const res = await api.post<BookProgress>("/api/v1/books/progresses", data);
-    return res.data;
+    const response = await api.post<BookProgress>("/api/v1/books/progresses", data);
+    return response.data;
   },
 
-  searchProgresses: async (params: {
-    username?: string;
-    bookId?: number;
-    status?: string;
-    isFavorite?: boolean;
-    score?: number;
-    pageCount?: number;
-    pageSize?: number;
-    pageNumber?: number;
-    orderBy?: string;
-    isAscendingOrder?: boolean;
-  }) => {
-    const res = await api.get<{
-      content: BookProgress[];
-      totalPages: number;
-      totalElements: number;
-    }>("/api/v1/books/progresses", { params });
-    return res.data.content;
-  },
-
-  updateProgress: async (id: number, data: UpdateBookProgress) => {
+   updateProgress: async (id: number, data: UpdateBookProgress) => {
     const res = await api.put<BookProgress>(`/api/v1/books/progresses/${id}`, data);
     return res.data;
   },
@@ -53,11 +69,13 @@ export const ProgressService = {
   },
 
   getProgressByUserAndBook: async (username: string, bookId: number) => {
-    const progresses = await ProgressService.searchProgresses({
-      username,
-      bookId,
-      pageSize: 1
-    });
-    return progresses.length > 0 ? progresses[0] : null;
+    const response = await ProgressService.getProgresses(
+      1, 
+      1, 
+      'createdAt', 
+      false, 
+      { username, bookId }
+    );
+    return response.content.length > 0 ? response.content[0] : null;
   }
 };

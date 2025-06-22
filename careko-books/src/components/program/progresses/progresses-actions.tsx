@@ -32,35 +32,35 @@ export function ProgressActions({ bookId }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState<CreateBookProgress | UpdateBookProgress>({
-    status: "PLANS_TO_READ",
+  
+  const [formData, setFormData] = useState({
+    status: "PLANS_TO_READ" as "PLANS_TO_READ" | "READING" | "FINISHED",
     isFavorite: false,
     score: 0,
     pageCount: 0,
-    username: user?.username || "",
-    bookId: bookId,
   });
 
-  // Busca o progresso existente
   useEffect(() => {
     const fetchProgress = async () => {
       if (!user?.username) return;
-      
       try {
         setIsLoading(true);
-        const progresses = await ProgressService.searchProgresses({
-          username: user.username,
-          bookId,
-          pageSize: 1,
-        });
+        const response = await ProgressService.getProgresses(
+          1, 
+          1, 
+          'createdAt',
+          false, 
+          { username: user.username, bookId } 
+        );
         
-        if (progresses.length > 0) {
-          setExistingProgress(progresses[0]);
+        if (response.content.length > 0) {
+          const progress = response.content[0];
+          setExistingProgress(progress);
           setFormData({
-            ...progresses[0],
-            id: progresses[0].id,
-            username: user.username,
-            bookId: bookId,
+            status: progress.status,
+            isFavorite: progress.isFavorite,
+            score: progress.score,
+            pageCount: progress.pageCount,
           });
         } else {
           setExistingProgress(null);
@@ -69,8 +69,6 @@ export function ProgressActions({ bookId }: Props) {
             isFavorite: false,
             score: 0,
             pageCount: 0,
-            username: user.username,
-            bookId: bookId,
           });
         }
       } catch (err) {
@@ -104,30 +102,43 @@ export function ProgressActions({ bookId }: Props) {
     try {
       setIsSubmitting(true);
       
-      const submissionData = {
+      const payload = {
         ...formData,
         username: user.username,
         bookId: bookId,
       };
 
       if (existingProgress) {
-        await ProgressService.updateProgress(
-          existingProgress.id, 
-          submissionData as UpdateBookProgress
-        );
+        await ProgressService.updateProgress(existingProgress.id, {
+          ...payload,
+          id: existingProgress.id
+        } as UpdateBookProgress);
         toast.success("Progresso atualizado com sucesso!");
       } else {
-        await ProgressService.createProgress(
-          submissionData as CreateBookProgress
-        );
+        await ProgressService.createProgress(payload as CreateBookProgress);
         toast.success("Progresso criado com sucesso!");
       }
       
+      
       setIsModalOpen(false);
       router.refresh();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao salvar progresso", err);
-      toast.error("Ocorreu um erro ao salvar o progresso");
+      
+      if (err.response?.status === 409) {
+        toast.error(
+          "Não é possível atualizar o progresso pois ele já foi finalizado",
+          {
+            description: "Progressos finalizados não podem ser alterados",
+            action: {
+              label: "Entendi",
+              onClick: () => {}
+            }
+          }
+        );
+      } else {
+        toast.error("Ocorreu um erro ao salvar o progresso");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -166,7 +177,7 @@ export function ProgressActions({ bookId }: Props) {
             <DialogDescription>
               Informe seu progresso de leitura, incluindo status, nota e páginas lidas.
             </DialogDescription>
-        </DialogHeader>
+          </DialogHeader>
           
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 py-4">
@@ -175,14 +186,6 @@ export function ProgressActions({ bookId }: Props) {
                 <Select
                   value={formData.status}
                   onValueChange={(v) => handleInputChange("status", v)}
-                  onOpenChange={(open) => {
-                    if (!open) {
-                      setTimeout(() => {
-                        const firstInput = document.querySelector('input');
-                        firstInput?.focus();
-                      }, 50);
-                    }
-                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o status" />
@@ -213,7 +216,6 @@ export function ProgressActions({ bookId }: Props) {
                   max="100"
                   value={formData.score}
                   onChange={(e) => handleInputChange("score", parseInt(e.target.value) || 0)}
-                  onFocus={(e) => e.target.select()}
                 />
               </div>
 
@@ -225,7 +227,6 @@ export function ProgressActions({ bookId }: Props) {
                   min="0"
                   value={formData.pageCount}
                   onChange={(e) => handleInputChange("pageCount", parseInt(e.target.value) || 0)}
-                  onFocus={(e) => e.target.select()}
                 />
               </div>
             </div>

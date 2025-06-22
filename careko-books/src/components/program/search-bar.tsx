@@ -20,7 +20,7 @@ export default function SearchBar(){
             type="text" 
             value={query}
             onChange={(e) => setquery(e.target.value)}
-            placeholder="Buscar livros..."
+            placeholder="Buscar livros/usuários..."
             className="text-white placeholder:text-white/70 bg-white/40 rounded-md "
         />
     </form>

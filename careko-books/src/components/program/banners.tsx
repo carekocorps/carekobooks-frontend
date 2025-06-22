@@ -24,7 +24,6 @@ export default function Banner({ image1, image2 }: BannerProps) {
               src={image1}
               alt="Banner chamativo"
               fill
-              sizes="(max-width: 640px) 100vw, 640px"
               className="object-cover rounded-lg"
             />
           </div>
@@ -35,7 +34,6 @@ export default function Banner({ image1, image2 }: BannerProps) {
               src={image2}
               alt="Banner chamativo"
               fill
-              sizes="(max-width: 640px) 100vw, 640px"
               className="object-cover rounded-lg"
             />
           </div>

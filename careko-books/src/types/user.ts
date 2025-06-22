@@ -3,8 +3,7 @@ export type UserType = {
   username: string;
   displayName: string;
   email: string;
-  description: string;
-  role: string;
+  description: string; 
   isEnabled: boolean;
   createdAt: string;
   updatedAt: string;

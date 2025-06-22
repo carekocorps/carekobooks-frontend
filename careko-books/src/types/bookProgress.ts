@@ -1,3 +1,12 @@
+export type ProgressResponse = {
+  content: BookProgress[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    totalElements: number;
+  };
+};
+
 export type BookProgress = {
   id: number;
   status: "PLANS_TO_READ" | "READING" | "FINISHED";
@@ -9,4 +18,4 @@ export type BookProgress = {
 };
 
 export type CreateBookProgress = Omit<BookProgress, "id">;
-export type UpdateBookProgress = Partial<Omit<BookProgress, "id">> & { id: number };
+export type UpdateBookProgress = Omit<BookProgress, "id"> & { id: number };

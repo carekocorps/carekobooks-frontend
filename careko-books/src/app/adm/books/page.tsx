@@ -1,17 +1,23 @@
-'use client';
+"use client";
 
-import { ArrowUp, ArrowDown, Search } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PaginationDemo } from '@/components/program/pagination-demo';
-import Book from '@/components/program/book/book';
-import { useQueries } from '@/hooks/useQueries';
-import CarouselBooks from '@/components/program/book/books-carousel';
-import { SkeletonCard } from '@/components/program/skeleton-card';
-import CreateBookModal from '@/components/program/book/create-book-modal';
-import { Input } from '@/components/ui/input';
+import { ArrowUp, ArrowDown, Search } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PaginationDemo } from "@/components/program/pagination-demo";
+import Book from "@/components/program/book/book";
+import { useQueries } from "@/hooks/useQueries";
+import CarouselBooks from "@/components/program/book/books-carousel";
+import { SkeletonCard } from "@/components/program/skeleton-card";
+import CreateBookModal from "@/components/program/book/create-book-modal";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Button } from '@/components/ui/button';
-import { BookService } from '@/services/books.service';
+import { Button } from "@/components/ui/button";
+import { BookService } from "@/services/books.service";
 
 export default function Books() {
   const {
@@ -24,45 +30,55 @@ export default function Books() {
     totalElements,
     orderBy,
     isAscending,
-    handleOrderChange
-  } = useQueries({ 
+    handleOrderChange,
+  } = useQueries({
     initialPageSize: 14,
-    initialOrderBy: 'title'
+    initialOrderBy: "title",
   });
 
   const sortingOptions = [
-    { value: 'title', label: 'Título' },
-    { value: 'author', label: 'Autor' },
-    { value: 'published-at', label: 'Data de Criação' },
+    { value: "title", label: "Título" },
+    { value: "author", label: "Autor" },
+    { value: "published-at", label: "Data de Criação" },
   ];
 
   const handleClearCache = async () => {
     try {
       await BookService.clearBookCache();
-      toast.success('Cache limpo com sucesso!');
+      toast.success("Cache limpo com sucesso!");
     } catch (error) {
-      console.error('Erro ao limpar cache:', error);
-      toast.error('Falha ao limpar cache');
+      console.error("Erro ao limpar cache:", error);
+      toast.error("Falha ao limpar cache");
     }
   };
 
   return (
-    <main className="container mx-auto px-4 py-8 space-y-8">
+    <main className="container mx-auto px-4 py-8 space-y-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <header className="space-y-6">
         {/* Título e ações */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-gray-800">Gerenciamento de Livros</h1>
-            <p className="text-gray-600">Administre o acervo literário da plataforma</p>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+              Gerenciamento de Livros
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Administre o acervo literário da plataforma
+            </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <Button
               onClick={handleClearCache}
               variant="outline"
-              className="gap-2 border-red-600 text-red-600 hover:bg-red-50 hover:text-red-700 w-full sm:w-auto"
+              className="
+                gap-2 border-red-600 text-red-600
+                hover:bg-red-50 hover:text-red-700
+                dark:border-red-500 dark:text-red-500
+                dark:hover:bg-red-900 dark:hover:text-red-300
+                w-full sm:w-auto
+              "
             >
-              <i className="bi bi-trash3"></i>
+              <i className="bi bi-trash3" />
               Limpar Cache
             </Button>
 
@@ -70,14 +86,18 @@ export default function Books() {
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Ordenar por" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
                 {sortingOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     <div className="flex items-center justify-between">
                       <span>{option.label}</span>
                       {orderBy === option.value && (
                         <span className="ml-2">
-                          {isAscending ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
+                          {isAscending ? (
+                            <ArrowUp size={16} />
+                          ) : (
+                            <ArrowDown size={16} />
+                          )}
                         </span>
                       )}
                     </div>
@@ -92,11 +112,11 @@ export default function Books() {
 
         {/* Resumo e Filtros Ativos */}
         <div className="flex flex-wrap items-center gap-3 text-sm">
-          <span className="bg-gray-100 px-3 py-1 rounded-full">
-            {totalElements} {totalElements === 1 ? 'livro' : 'livros'}
+          <span className="bg-gray-100 dark:bg-gray-700 dark:text-gray-100 px-3 py-1 rounded-full">
+            {totalElements} {totalElements === 1 ? "livro" : "livros"}
           </span>
           {searchQuery && (
-            <span className="bg-primary/10 text-primary px-3 py-1 rounded-full">
+            <span className="bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary/80 px-3 py-1 rounded-full">
               Filtrado: {searchQuery}
             </span>
           )}
@@ -104,21 +124,18 @@ export default function Books() {
 
         {/* Campo de busca */}
         <div className="relative w-full max-w-lg">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
           <Input
             placeholder="Pesquisar livros..."
-            className="pl-10 w-full"
+            className="pl-10 w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             defaultValue={searchQuery}
             onChange={(e) => {
               const value = e.target.value;
-              if (typeof window !== 'undefined') {
+              if (typeof window !== "undefined") {
                 const url = new URL(window.location.href);
-                if (value) {
-                  url.searchParams.set('search', value);
-                } else {
-                  url.searchParams.delete('search');
-                }
-                window.history.pushState({}, '', url.toString());
+                if (value) url.searchParams.set("search", value);
+                else url.searchParams.delete("search");
+                window.history.pushState({}, "", url.toString());
               }
             }}
           />
@@ -135,7 +152,9 @@ export default function Books() {
           />
         ) : books.length === 0 ? (
           <div className="text-center py-12 space-y-2">
-            <p className="text-gray-500">Nenhum livro encontrado</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              Nenhum livro encontrado
+            </p>
             {!searchQuery && <CreateBookModal />}
           </div>
         ) : (
@@ -145,7 +164,7 @@ export default function Books() {
           >
             {books.map((book) => (
               <li key={book.id}>
-                <Book bookItem={book} isAdmin={true} />
+                <Book bookItem={book} isAdmin />
               </li>
             ))}
           </ul>
@@ -154,7 +173,10 @@ export default function Books() {
 
       {/* Paginação */}
       {totalPages > 1 && (
-        <nav aria-label="Paginação" className="flex justify-center pt-4">
+        <nav
+          aria-label="Paginação"
+          className="flex justify-center pt-4"
+        >
           <PaginationDemo totalPages={totalPages} page={page} setPage={setPage} />
         </nav>
       )}
