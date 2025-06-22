@@ -89,11 +89,43 @@ export const ThreadService = {
     replies.forEach(reply => {
       replyMap.set(reply.id, reply);
       
-      if (!reply.parentId) {
+      if (!reply.parent?.id) {
         rootReplies.push(reply);
       }
     });
     
     return rootReplies;
+  },
+
+  getFirstLevelReplies: async (threadId: number, parentId?: number) => {
+    const res = await api.get<{
+      content: ThreadReply[];
+      totalPages: number;
+      totalElements: number;
+    }>("/api/v1/books/threads/replies", {
+      params: {
+        threadId,
+        parentId,
+        pageSize: 100,
+        sort: "createdAt,asc"
+      }
+    });
+    return res.data.content;
+  },
+
+  hasChildReplies: async (replyId: number) => {
+    try {
+      const res = await api.get<{
+        totalElements: number;
+      }>("/api/v1/books/threads/replies", {
+        params: {
+          parentId: replyId,
+          pageSize: 0
+        }
+      });
+      return res.data.totalElements > 0;
+    } catch {
+      return false;
+    }
   }
 };

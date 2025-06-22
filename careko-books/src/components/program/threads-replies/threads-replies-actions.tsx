@@ -61,6 +61,7 @@ export function ThreadReplyActions({ threadId, parentId, existingReply, onSucces
       }
       
       setIsModalOpen(false);
+      setContent(""); 
       onSuccess?.();
       router.refresh();
     } catch (err) {
@@ -89,17 +90,23 @@ export function ThreadReplyActions({ threadId, parentId, existingReply, onSucces
     }
   };
 
+  const handleOpenChange = (open: boolean) => {
+    setIsModalOpen(open);
+    if (!open) {
+      setContent(existingReply?.content || "");
+    }
+  };
+
   if (!user) return null;
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+    <Dialog open={isModalOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {existingReply ? (
           <Button 
             variant="ghost" 
             size="icon" 
             className="text-gray-500 hover:text-indigo-600"
-            onClick={() => setContent(existingReply.content)}
           >
             <Pencil className="w-4 h-4" />
           </Button>
@@ -117,7 +124,6 @@ export function ThreadReplyActions({ threadId, parentId, existingReply, onSucces
       <DialogContent 
         className="sm:max-w-xl"
         onOpenAutoFocus={(e) => e.preventDefault()}
-        onCloseAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle>
@@ -134,6 +140,7 @@ export function ThreadReplyActions({ threadId, parentId, existingReply, onSucces
                 rows={5}
                 placeholder="Escreva sua resposta..."
                 required
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -146,7 +153,7 @@ export function ThreadReplyActions({ threadId, parentId, existingReply, onSucces
                 onClick={handleDelete}
                 disabled={isSubmitting}
               >
-                Excluir Resposta
+                {isSubmitting ? "Excluindo..." : "Excluir Resposta"}
               </Button>
             )}
             

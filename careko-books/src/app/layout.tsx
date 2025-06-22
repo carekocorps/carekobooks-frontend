@@ -10,8 +10,10 @@ import SearchBar from "@/components/program/search-bar";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import Link from "next/link";
 import { Toaster } from "sonner";
-import AuthProvider, { useAuth } from "@/components/program/auth/auth-provider"; 
+import AuthProvider, { useAuth } from "@/components/program/auth/auth-provider";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const tiltNeon = Tilt_Neon({
   variable: "--font-tilt-neon",
@@ -24,9 +26,20 @@ const tiltWarp = Tilt_Warp({
   weight: ["400"],
 });
 
+// Configuração do QueryClient com opções recomendadas para Next.js
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minuto
+      refetchOnWindowFocus: process.env.NODE_ENV === 'production',
+      retry: 2,
+    },
+  },
+});
+
 function AuthenticatedContent({ children }: { children: React.ReactNode }) { 
   const { logout } = useAuth();
-  const { user, loading, error } = useCurrentUser();
+  const { user } = useCurrentUser();
 
   return (
     <main className="bg-white min-h-screen flex flex-col items-center">
@@ -62,7 +75,7 @@ function AuthenticatedContent({ children }: { children: React.ReactNode }) {
         </nav>
 
         {children}
-        <Toaster richColors />
+        <Toaster richColors position="top-right" />
       </NuqsAdapter>
     </main>
   );
@@ -74,13 +87,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body className={`${tiltNeon.variable} antialiased`}>
         <AuthProvider>
-          <AuthenticatedContent>{children}</AuthenticatedContent> 
+          <QueryClientProvider client={queryClient}>
+            <AuthenticatedContent>{children}</AuthenticatedContent>
+            {process.env.NODE_ENV === 'development' && (
+              <ReactQueryDevtools initialIsOpen={false} />
+            )}
+          </QueryClientProvider>
         </AuthProvider>
       </body>
     </html>
   );
 }
-

@@ -1,4 +1,5 @@
 import { UserType } from "./user";
+import { BookType } from "./book";
 
 export type Thread = {
   id: number;
@@ -7,7 +8,8 @@ export type Thread = {
   createdAt: string;
   updatedAt: string;
   user: UserType;
-  bookId: number;
+  book: BookType;
+  replies?: ThreadReply[];
 };
 
 export type CreateThread = {
@@ -25,8 +27,24 @@ export type ThreadReply = {
   createdAt: string;
   updatedAt: string;
   user: UserType;
-  threadId: number;
-  parentId?: number;
+  thread: {
+    id: number;
+    title: string;
+    description: string;
+    createdAt: string;
+    updatedAt: string;
+    user: UserType;
+    book: BookType;
+  };
+  parent?: {
+    id: number;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    user: UserType;
+  };
+  children?: ThreadReply[];
+  isContainingChildren: boolean;
 };
 
 export type CreateThreadReply = {

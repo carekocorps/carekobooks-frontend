@@ -1,114 +1,277 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import Activity from "@/components/program/activity";
 import FollowModal from "@/components/program/follow-modal";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useParams } from "next/navigation";
+import { useCurrentUser } from "@/hooks/useCurrentUser"; 
 
-const mockFollowers = [
-    { name: "Park Jimin", username: "@parkjimin", avatar: "/usersMock/rose.png", isFollowing: true },
-    { name: "Kim Taehyung", username: "@taehyung", avatar: "/usersMock/jennie.png", isFollowing: false },
-    { name: "Kim Namjoon", username: "@namjoon", avatar: "/usersMock/sana.png", isFollowing: false },
-];
+import { UserType } from "@/types/user";
+import { BookActivity } from "@/types/activity"; 
 
-const mockFollowing = [
-    { name: "Min Yoongi", username: "@agustd", avatar: "/usersMock/ro.png", isFollowing: true },
-    { name: "Park Jimin", username: "@parkjimin", avatar: "/usersMock/rose.png", isFollowing: true },
-];
+import { UserService } from "@/services/user.services";
+import { UserSocialService } from "@/services/userSocial.service";
 
 export default function ViewOtherUserProfile() {
-    const [modalOpen, setModalOpen] = useState<"seguidores" | "seguindo" | null>(null);
-    const [isFollowing, setIsFollowing] = useState(false);
+  const params = useParams();
+  const username = params.username as string;
+  const currentUser = useCurrentUser().user; 
 
-    const handleOpen = (tab: "seguidores" | "seguindo") => {
-        setModalOpen(tab);
+  const [user, setUser] = useState<UserType | null>(null);
+  const [activities, setActivities] = useState<BookActivity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState<"seguidores" | "seguindo" | null>(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [loadingFollow, setLoadingFollow] = useState(false);
+  const [followers, setFollowers] = useState<any[]>([]);
+  const [following, setFollowing] = useState<any[]>([]);
+  const wsRef = useRef<WebSocket | null>(null); 
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        const userData = await UserService.getUserByUsername(username);
+        setUser(userData);
+
+        // Verifica se o usuário logado segue o perfil visualizado
+        if (currentUser?.username !== username) {
+          const response = await UserSocialService.getFollowing(currentUser?.username ?? "", { pageSize: 100 });
+          const seguidos = response.data.content;
+          const segue = seguidos.some((u: any) => u.username === username);
+          setIsFollowing(segue);
+        }
+
+        setError(null);
+      } catch (err) {
+        setError("Usuário não encontrado");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleClose = () => {
-        setModalOpen(null);
+    if (username && currentUser) {
+      fetchUserData();
+    }
+  }, [username, currentUser]);
+
+  useEffect(() => {
+    if (!modalOpen || !username) return;
+
+    const fetchFollowData = async () => {
+      try {
+        const response = modalOpen === "seguidores" 
+          ? await UserSocialService.getFollowers(username, { pageSize: 100 }) 
+          : await UserSocialService.getFollowing(username, { pageSize: 100 });
+
+        const data = response.data.content; 
+
+        if (modalOpen === "seguidores") {
+          setFollowers(data);
+        } else {
+          setFollowing(data);
+        }
+      } catch (error) {
+        console.error(`Erro ao carregar ${modalOpen}:`, error);
+      }
     };
 
-    const handleFollow = () => {
-        setIsFollowing(!isFollowing);
-    };
+    fetchFollowData();
+  }, [modalOpen, username]);
 
+  const handleOpen = (tab: "seguidores" | "seguindo") => {
+    setModalOpen(tab);
+  };
+
+  const handleClose = () => {
+    setModalOpen(null);
+  };
+
+  const handleFollow = async () => {
+    if (!user || loadingFollow || !currentUser) return;
+
+    try {
+      setLoadingFollow(true);
+      if (isFollowing) {
+        await UserSocialService.unfollowUser(currentUser.username, user.username);
+      } else {
+        await UserSocialService.followUser(currentUser.username, user.username);
+      }
+      setIsFollowing(!isFollowing);
+
+      setUser({
+        ...user,
+        followersCount: isFollowing 
+          ? user.followersCount - 1 
+          : user.followersCount + 1
+      });
+    } catch (error) {
+      console.error("Erro ao seguir usuário:", error);
+    } finally {
+      setLoadingFollow(false);
+    }
+  };
+
+  if (loading) {
     return (
-        <main>
-            <div className="flex gap-12 mt-25">
-                <div className="bg-white shadow-xl w-180 h-100 rounded-2xl relative overflow-visible flex flex-col justify-center items-start gap-5 pt-20">
-                    <div className="absolute -top-10 left-[20%] transform -translate-x-1/2">
-                        <Avatar className="w-40 h-40 border-6 border-white shadow-md">
-                            <AvatarImage
-                                src="/usersMock/jk.png"
-                                alt="Imagem de avatar"
-                                className="object-cover w-full h-full"
-                            />
-                        </Avatar>
-                    </div>
+      <div className="flex justify-center items-center h-screen">
+        <div className="space-y-4">
+          <Skeleton className="h-32 w-32 rounded-full mx-auto" />
+          <Skeleton className="h-6 w-48 mx-auto" />
+          <Skeleton className="h-4 w-32 mx-auto" />
+          <div className="flex justify-center gap-6 mt-4">
+            <Skeleton className="h-8 w-24" />
+            <Skeleton className="h-8 w-24" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-                    <div className="flex flex-col m-15 gap-5">
-                        <div className="flex justify-between items-center">
-                            <div className="flex flex-col items-start text-center">
-                                <h1 className="text-3xl">Jeon Jungkook</h1>
-                                <h2>@jk</h2>
-                            </div>
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-red-500 bg-red-50 p-6 rounded-xl max-w-md text-center">
+          <h2 className="font-bold text-lg mb-2">Erro ao carregar perfil</h2>
+          <p>{error}</p>
+          <Button 
+            className="mt-4"
+            onClick={() => window.location.reload()}
+          >
+            Tentar novamente
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
-                            <div className="flex flex-col gap-2 px-4 min-w-[300px]">
-                                <div className="flex justify-between w-full px-4">
-                                    <button
-                                        onClick={() => handleOpen("seguidores")}
-                                        className="text-sm text-blue-600 hover:underline"
-                                    >
-                                        {mockFollowers.length} seguidores
-                                    </button>
-                                    <button
-                                        onClick={() => handleOpen("seguindo")}
-                                        className="text-sm text-blue-600 hover:underline"
-                                    >
-                                        {mockFollowing.length} seguindo
-                                    </button>
-                                    <h1 className="text-sm">10 livros</h1>
-                                </div>
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="bg-blue-50 text-blue-800 p-6 rounded-xl max-w-md text-center">
+          <h2 className="font-bold text-lg mb-2">Usuário não encontrado</h2>
+          <p>O perfil solicitado não está disponível</p>
+        </div>
+      </div>
+    );
+  }
 
-                                <div className="flex justify-end mt-2">
-                                    <Button
-                                        className={`${isFollowing ? 'bg-gray-200 text-gray-800 hover:bg-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
-                                        onClick={handleFollow}
-                                    >
-                                        {isFollowing ? 'Seguindo' : 'Seguir'}
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
+  return (
+    <main className="p-4 md:p-8 mx-auto flex justify-center">
+      <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6 mt-8 justify-center">
+        <div className="bg-white dark:bg-gray-900 shadow-lg w-full lg:w-2/5 rounded-2xl relative overflow-visible flex flex-col items-center gap-5 pt-24 pb-8 px-6 border border-gray-100 dark:border-gray-800 mx-auto">
+          <div className="absolute -top-16 left-1/2 transform -translate-x-1/2">
+            <Avatar className="w-32 h-32 border-4 border-white dark:border-gray-900 shadow-lg">
+              <AvatarImage
+                src={user.image?.url || "/default-avatar.png"}
+                alt={`Avatar de ${user.displayName}`}
+                className="object-cover w-full h-full"
+              />
+            </Avatar>
+          </div>
 
-                        <div className="w-150 h-30 bg-gray-200 rounded-2xl">
-                            <p className="m-10">testando testando testando testando testando testando</p>
-                        </div>
-                    </div>
+          <div className="flex flex-col w-full gap-6 mt-4 items-center">
+            <div className="flex flex-col items-center w-full gap-4">
+              <div className="text-center">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
+                  {user.displayName}
+                </h1>
+                <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
+              </div>
 
-                    {modalOpen && (
-                        <FollowModal
-                            activeTab={modalOpen}
-                            onClose={handleClose}
-                            followers={mockFollowers}
-                            following={mockFollowing}
-                        />
-                    )}
+              <div className="flex justify-center gap-6 w-full text-sm text-gray-600 dark:text-gray-300">
+                <button 
+                  onClick={() => handleOpen("seguidores")}
+                  className="flex flex-col items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  <span className="font-bold text-gray-900 dark:text-white">{user.followersCount}</span>
+                  <span>Seguidores</span>
+                </button>
+                <button 
+                  onClick={() => handleOpen("seguindo")}
+                  className="flex flex-col items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  <span className="font-bold text-gray-900 dark:text-white">{user.followingCount}</span>
+                  <span>Seguindo</span>
+                </button>
+                <div className="flex flex-col items-center">
+                  <span className="font-bold text-gray-900 dark:text-white">{user.progressesCount}</span>
+                  <span>Progressos</span>
                 </div>
+              </div>
 
-                <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 shadow-xl w-180 h-100 rounded-2xl
-        flex flex-col justify-center items-center py-6 px-4">
-                    <h1 className="text-white text-3xl mb-6 font-medium">
-                        Mural de Atividades
-                    </h1>
-                    <div className="w-full max-w-[90%] space-y-4">
-                    <Activity username="@parkjimin" livro="Mulherzinhas" horario="15:00" imagem="/usersMock/rose.png" acao="leu" />
-                    <Activity username="@agustd" livro="Noites Brancas" horario="18:00" imagem="/usersMock/sana.png" acao="favoritou" />
-                    </div>
+              {currentUser?.username !== user.username && (
+                <div className="w-full max-w-xs">
+                  <Button
+                    className={`w-full ${isFollowing 
+                      ? 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600' 
+                      : 'bg-blue-600 hover:bg-blue-700'}`}
+                    onClick={handleFollow}
+                    disabled={loadingFollow}
+                  >
+                    {loadingFollow ? (
+                      <span className="flex items-center justify-center">
+                        <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></span>
+                        Carregando...
+                      </span>
+                    ) : isFollowing ? 'Seguindo' : 'Seguir'}
+                  </Button>
                 </div>
+              )}
             </div>
 
-            <h2 className="mt-10 text-lg font-medium">Seus Livros</h2>
-        </main>
-    );
+            <div className="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-xl text-center">
+              <p className="text-gray-700 dark:text-gray-300">
+                {user.description || "Este usuário ainda não adicionou uma descrição."}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full lg:w-2/5 space-y-6 mx-auto">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg rounded-2xl p-6">
+            <h1 className="text-white text-2xl font-bold mb-6 text-center">
+              Mural de Atividades
+            </h1>
+
+            <div className="space-y-4 max-h-[500px] overflow-y-auto px-2">
+              {activities.length > 0 ? (
+                activities.map(activity => (
+                  <div key={activity.id} className="mx-auto">
+                    <Activity activity={activity} />
+                  </div>
+                ))
+              ) : (
+                <div className="w-full bg-white/80 dark:bg-gray-800 rounded-xl flex flex-col shadow-md p-4 gap-2 border border-gray-100 dark:border-gray-700 text-center mx-auto">
+                  <p className="text-gray-500 dark:text-gray-400">
+                    Nenhuma atividade recente
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-6">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center">
+              Estatísticas de Leitura
+            </h2>
+
+          </div>
+        </div>
+      </div>
+
+      {modalOpen && (
+        <FollowModal
+          activeTab={modalOpen}
+          onCloseAction={handleClose}
+          followers={followers}
+          following={following}
+        />
+      )}
+    </main>
+  );
 }

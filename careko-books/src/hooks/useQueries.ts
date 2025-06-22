@@ -4,8 +4,8 @@ import { BookService } from '@/services/books.service';
 import { UserService } from '@/services/user.services';
 import { BookType } from '@/types/book';
 import { UserType } from '@/types/user';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState, useRef } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useState, useMemo, startTransition } from 'react';
 import { useQueryState } from 'nuqs';
 
 interface UseQueriesOptions {
@@ -25,57 +25,42 @@ interface BookFilters {
   genre?: string;
 }
 
-export const useQueries = ({ 
-  initialPage = 1, 
+export const useQueries = ({
+  initialPage = 1,
   initialPageSize = 10,
   initialOrderBy = 'title',
   initialIsAscending = true,
-  initialResourceType = 'books'
+  initialResourceType = 'books',
 }: UseQueriesOptions = {}) => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
-  const prevFilters = useRef<BookFilters | null>(null);
 
-  const [page, setPage] = useQueryState('page', {
-    history: 'push',
-    parse: Number,
-    defaultValue: initialPage,
-  });
-
-  const [pageSize, setPageSize] = useQueryState('pageSize', {
-    history: 'push',
-    parse: Number,
-    defaultValue: initialPageSize,
-  });
-
-  const [orderBy, setOrderBy] = useQueryState('orderBy', {
-    history: 'push',
-    defaultValue: initialOrderBy,
-  });
-
+  const [page, setPage] = useQueryState('page',   { history: 'push', shallow: true, parse: Number, defaultValue: initialPage });
+  const [pageSize, setPageSize] = useQueryState('pageSize', { history: 'push', shallow: true, parse: Number, defaultValue: initialPageSize });
+  const [orderBy, setOrderBy] = useQueryState('orderBy', { history: 'push', shallow: true, defaultValue: initialOrderBy });
   const [isAscending, setIsAscending] = useQueryState('isAscending', {
     history: 'push',
-    parse: (value) => value === 'true',
-    serialize: (value) => value.toString(),
+    shallow: true,
+    parse: v => v === 'true',
+    serialize: v => v.toString(),
     defaultValue: initialIsAscending,
   });
-
   const [filters, setFilters] = useQueryState('filters', {
     history: 'push',
-    parse: (value) => {
-      try {
-        return value ? JSON.parse(decodeURIComponent(value)) : {};
-      } catch {
-        return {};
-      }
+    shallow: true,
+    parse: v => {
+      try { return v ? JSON.parse(decodeURIComponent(v)) : {}; }
+      catch { return {}; }
     },
-    serialize: (value) => {
-      return value && Object.keys(value).length > 0 
-        ? encodeURIComponent(JSON.stringify(value))
-        : '';
-    },
+    serialize: v =>
+      v && Object.keys(v).length > 0
+        ? encodeURIComponent(JSON.stringify(v))
+        : '',
     defaultValue: {},
   });
+
+  const filtersString = useMemo(() => JSON.stringify(filters), [filters]);
 
   const [resourceType, setResourceType] = useState<'books' | 'users'>(initialResourceType);
   const [books, setBooks] = useState<BookType[]>([]);
@@ -86,75 +71,77 @@ export const useQueries = ({
 
   useEffect(() => {
     const fetchData = async () => {
-      // Verifica se os filtros realmente mudaram
-      if (JSON.stringify(filters) === JSON.stringify(prevFilters.current)) {
-        return;
-      }
-
       setLoading(true);
-      prevFilters.current = filters;
+
+      const parsedFilters = (filtersString && JSON.parse(filtersString)) as BookFilters;
 
       try {
         if (resourceType === 'books') {
-          const response = await BookService.getBooks(
-            page, 
-            pageSize, 
-            searchQuery,
-            orderBy,
-            isAscending,
-            filters as BookFilters
+          const res = await BookService.getBooks(
+            page, pageSize, searchQuery,
+            orderBy, isAscending,
+            parsedFilters
           );
-          
-          if (response.status >= 200 && response.status < 300) {
-            const { content, pageable } = response.data;
+          if (res.status >= 200 && res.status < 300) {
+            const { content, pageable } = res.data;
             setBooks(content);
             setTotalPages(Math.ceil(pageable.totalElements / pageable.pageSize));
             setTotalElements(pageable.totalElements);
           }
         } else {
-          const response = await UserService.getUsers(
-            page, 
-            pageSize, 
-            searchQuery,
-            orderBy,
-            isAscending
+          const res = await UserService.getUsers(
+            page, pageSize, searchQuery,
+            orderBy, isAscending
           );
-          const { content, pageable } = response.data;
-          setUsers(content);
-          setTotalPages(Math.ceil(pageable.totalElements / pageable.pageSize));
-          setTotalElements(pageable.totalElements);
+          if (res.status >= 200 && res.status < 300) {
+            const { content, pageable } = res.data;
+            setUsers(content);
+            setTotalPages(Math.ceil(pageable.totalElements / pageable.pageSize));
+            setTotalElements(pageable.totalElements);
+          }
         }
-      } catch (error) {
-        console.error('Error fetching data:', error);
+      } catch (err) {
+        console.error('Error fetching data:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    const timer = setTimeout(fetchData, 300); // Debounce de 300ms
+    const timer = setTimeout(fetchData, 300);
     return () => clearTimeout(timer);
-  }, [resourceType, searchQuery, page, pageSize, orderBy, isAscending, filters]);
+  }, [
+    resourceType,
+    searchQuery,
+    page,
+    pageSize,
+    orderBy,
+    isAscending,
+    filtersString, 
+  ]);
 
   const handleOrderChange = (newOrderBy: string) => {
-    if (newOrderBy === orderBy) {
-      setIsAscending(!isAscending);
-    } else {
-      setOrderBy(newOrderBy);
-      setIsAscending(true);
-    }
-    setPage(1);
+    startTransition(() => {
+      setPage(1);
+      if (newOrderBy === orderBy) {
+        setIsAscending(!isAscending);
+      } else {
+        setOrderBy(newOrderBy);
+        setIsAscending(true);
+      }
+    });
   };
 
   const handleResourceTypeChange = (type: 'books' | 'users') => {
-    if (type === 'books') {
-      setOrderBy('title');
-    } else {
-      setOrderBy('username');
-    }
-    setResourceType(type);
-    setIsAscending(true);
-    setPage(1);
-    setFilters({});
+
+    startTransition(() => {
+      const params = new URLSearchParams(Array.from(searchParams.entries()));
+      params.set('page', '1');
+      params.set('orderBy', type === 'books' ? 'title' : 'username');
+      params.set('isAscending', 'true');
+      params.delete('filters');
+      router.replace(`?${params.toString()}`);
+      setResourceType(type);
+    });
   };
 
   return {
