@@ -1,6 +1,5 @@
 import { UserType } from "@/types/user";
 
-import { BsShieldLockFill } from "react-icons/bs";
 import Link from "next/link";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 

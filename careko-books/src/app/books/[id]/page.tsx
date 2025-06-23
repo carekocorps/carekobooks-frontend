@@ -5,15 +5,13 @@ import { ProgressActions } from "@/components/program/progresses/progresses-acti
 import { ReviewActions } from "@/components/program/review/reviews";
 import { ThreadActions } from "@/components/program/threads/threads-actions";
 import { ThreadList } from "@/components/program/threads/threads-list";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Terminal } from "lucide-react";
 import { BookRatingVisualization } from "@/components/program/book/book-rating";
 
 interface BookDetailPageProps {
-  params: { id: string };
+  params: { id: number }
 }
 
-export default async function BookDetailPage({ params }: BookDetailPageProps) {
+export default async function BookDetailPage({ params }: any) {
   const bookId = Number(params.id);
   if (isNaN(bookId)) return notFound();
 

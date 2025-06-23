@@ -10,23 +10,17 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useQueryClient } from "@tanstack/react-query";
 import { ActivityService } from "@/services/activity.service";
 import { useStatusProgresses } from "@/hooks/useStatusProgresses";
-import { Book } from "lucide-react";
 import Banner from "@/components/program/layout/banners";
 
 export default function HomeContent() {
   const { books: recentBooks, loading } = useQueries({
     initialOrderBy: "createdAt",
-    initialIsAscending: false,
   });
   const { books } = useQueries();
 
   const { user } = useCurrentUser();
   const { 
-      count, 
-      progresses, 
-      loading: progressLoading, 
-      error: progressError,
-      totalPages
+      progresses,
     } = useStatusProgresses({
       username: user?.username,
       status: "READING"

@@ -8,11 +8,11 @@ import { useStatusProgresses } from "@/hooks/useStatusProgresses";
 
 export default function ViewDashboard(){
     const { user, loading, error } = useCurrentUser();
-    const { count: finishedCount, loading: finishedLoading, error: finishedError } = 
+    const { count: finishedCount } = 
     useStatusProgresses({ username: user?.username, status: "FINISHED" });
-    const { count: readingCount, loading: readingLoading, error: readingError } = 
+    const { count: readingCount } = 
     useStatusProgresses({ username: user?.username, status: "READING" });
-    const { count: plansCount, loading: plansLoading, error: plansError } = 
+    const { count: plansCount  } = 
     useStatusProgresses({ username: user?.username, status: "PLANS_TO_READ" });
 
     if (loading) {

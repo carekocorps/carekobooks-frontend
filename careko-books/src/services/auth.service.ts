@@ -67,9 +67,10 @@ export async function initializeAuth(
           keycloak!.logout();
         });
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Keycloak init error:', err);
-    onError(err?.message || 'Falha na autenticação. Por favor, tente novamente.');
+    const errorMessage = err instanceof Error ? err.message : 'Falha na autenticação. Por favor, tente novamente.';
+    onError(errorMessage);
   }
 }
 

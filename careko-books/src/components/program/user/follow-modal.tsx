@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { UserType } from "@/types/user";
 import Link from "next/link";

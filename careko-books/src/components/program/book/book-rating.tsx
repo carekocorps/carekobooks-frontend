@@ -1,5 +1,4 @@
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Star, Info, BarChart, PieChart } from "lucide-react";
+import { BarChart } from "lucide-react";
 
 interface BookRatingProps {
   userAverageScore: number;

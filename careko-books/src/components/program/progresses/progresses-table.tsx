@@ -2,7 +2,7 @@
 
 import Book from "@/components/program/book/book";
 import { ProgressStatus, useStatusProgresses } from "@/hooks/useStatusProgresses";
-import { Frown, BookOpen, Bookmark } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { PaginationDemo } from "@/components/program/utils/pagination-demo";

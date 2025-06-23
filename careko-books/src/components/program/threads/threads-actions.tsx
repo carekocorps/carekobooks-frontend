@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Plus, Pencil } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { ThreadService } from "@/services/threads.service";
