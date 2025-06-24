@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: carekobooks-frontend:latest
     container_name: carekobooks-frontend
     ports:
       - "3000:3000"
