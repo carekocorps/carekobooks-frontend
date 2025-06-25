@@ -2,13 +2,14 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { BookService } from "@/services/books.service";
 import { ProgressActions } from "@/components/program/progresses/progresses-actions";
-import { ReviewActions } from "@/components/program/review/reviews";
+import { ReviewActions } from "@/components/program/review/reviews-actions";
 import { ThreadActions } from "@/components/program/threads/threads-actions";
 import { ThreadList } from "@/components/program/threads/threads-list";
 import { BookRatingVisualization } from "@/components/program/book/book-rating";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { Card } from "@/components/ui/card";
 import { MessageSquare, PenSquare } from "lucide-react";
+import { ReviewList } from "@/components/program/review/reviews-list";
 
 interface BookDetailPageProps {
   params: { id: number }
@@ -81,7 +82,7 @@ export default async function BookDetailPage({ params }: any) {
         <aside className="lg:col-span-2">
           <BookRatingVisualization 
             userAverageScore={bookData.userAverageScore} 
-            reviewCount={bookData.reviewCount} 
+         
           />
         </aside>
 
@@ -122,32 +123,7 @@ export default async function BookDetailPage({ params }: any) {
 
             <TabsContent value="reviews">
               <Card className="bg-gradient-to-br from-white via-slate-50 to-white dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg dark:shadow-black/20 p-6">
-                <div className="flex flex-col items-center justify-center py-16">
-                  <PenSquare size={64} className="text-gray-400 dark:text-gray-500 mb-6" />
-                  <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-3">
-                    Resenhas em Desenvolvimento
-                  </h3>
-                  <p className="text-gray-500 dark:text-gray-400 text-center max-w-md mb-6">
-                    não grita
-                  </p>
-                  <div className="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-xl w-16 h-1 mb-6" />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
-                    {[1, 2].map((item) => (
-                      <div key={item} className="animate-pulse">
-                        <div className="flex items-start gap-4">
-                          <div className="bg-gray-200 dark:bg-gray-700 rounded-full w-12 h-12" />
-                          <div className="flex-1">
-                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2" />
-                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-3" />
-                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full mb-1" />
-                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-1" />
-                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <ReviewList bookId={bookData.id} />
               </Card>
             </TabsContent>
           </Tabs>

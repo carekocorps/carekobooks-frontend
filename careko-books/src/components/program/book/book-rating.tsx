@@ -2,15 +2,10 @@ import { BarChart } from "lucide-react";
 
 interface BookRatingProps {
   userAverageScore: number;
-  reviewCount: number;
 }
 
-export const BookRatingVisualization = ({ userAverageScore, reviewCount }: BookRatingProps) => {
+export const BookRatingVisualization = ({ userAverageScore }: BookRatingProps) => {
   const userScore = userAverageScore / 10;
-  const starRating = Math.round(userScore * 2) / 2; 
-  const fullStars = Math.floor(starRating);
-  const hasHalfStar = starRating % 1 !== 0;
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
   return (
     <div className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 p-6 sm:p-8 rounded-2xl shadow-lg dark:shadow-black/30 mt-4">

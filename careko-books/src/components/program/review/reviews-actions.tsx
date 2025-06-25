@@ -87,7 +87,7 @@ export function ReviewActions({ bookId }: Props) {
     }
   }, [user, bookId]);
 
-  const handleInputChange = (field: keyof typeof formData, value: any) => {
+  const handleInputChange = (field: keyof typeof formData, value: unknown) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,

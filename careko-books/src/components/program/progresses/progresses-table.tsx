@@ -19,8 +19,6 @@ export default function ViewProgressTable({ username } : ProgressTableProps) {
   const { 
     count, 
     progresses, 
-    loading: progressLoading, 
-    error: progressError,
     totalPages
   } = useStatusProgresses({
     username: username,
