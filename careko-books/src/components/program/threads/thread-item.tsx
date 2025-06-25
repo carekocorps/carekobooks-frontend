@@ -77,7 +77,7 @@ export function ThreadItem({
       
       {isExpanded && (
         <div className="bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 p-6">
-          <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-4">Respostas</h4>
+          <h4 className="font-medium text-gray-700 dark:text-white mb-4">Respostas</h4>
           <div className="space-y-4">
             {replies.length > 0 ? (
               <ReplyList 

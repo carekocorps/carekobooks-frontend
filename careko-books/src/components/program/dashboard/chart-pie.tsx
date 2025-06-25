@@ -1,8 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { TrendingUp } from "lucide-react"
-import { Label, Pie, PieChart } from "recharts"
+import * as React from "react";
+import { TrendingUp } from "lucide-react";
+import { Label, Pie, PieChart } from "recharts";
+import { BookOpen } from "lucide-react";
 
 import {
   Card,
@@ -11,14 +12,14 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-import { useGenreProgresses } from "@/hooks/useGenreProgresses" 
+} from "@/components/ui/chart";
+import { useGenreProgresses } from "@/hooks/useGenreProgresses";
 
 const palette = [
   'var(--chart-1)',
@@ -65,6 +66,28 @@ export function GenrePieChart({ username }: GenrePieChartProps) {
 
   if (error) {
     return <div className="flex justify-center p-8 text-red-500">Erro: {error}</div>;
+  }
+
+  if (totalProgresses === 0) {
+    return (
+      <Card className="flex flex-col">
+        <CardHeader className="items-center pb-0">
+          <CardTitle>Livros por Gênero</CardTitle>
+          <CardDescription>Distribuição dos seus progressos</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 pb-0">
+          <div className="flex flex-col items-center justify-center py-16 p-20 border-2 border-dashed rounded-2xl bg-gray-50 dark:bg-gray-800/50 dark:border-gray-700">
+            <BookOpen className="h-16 w-16 text-gray-400 dark:text-gray-500 mb-4" />
+            <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-2">
+              Nenhum livro lido
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 text-center max-w-md mb-6">
+              Este usuário ainda não possui livros registrados, portanto não possui gráfico por gênero!
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

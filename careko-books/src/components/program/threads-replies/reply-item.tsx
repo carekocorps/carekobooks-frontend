@@ -37,7 +37,7 @@ export function ReplyItem({
   return (
     <div className="mt-4">
       <div 
-        className={`border-l-2 ${depth > 0 ? 'border-indigo-200' : 'border-transparent'} pl-4 py-2`}
+        className={`border-l-2 ${depth > 0 ? 'border-indigo-200 dark:border-blue-400' : 'border-transparent'} pl-4 py-2`}
         style={{ marginLeft: `${marginLeft}px` }}
       >
         <div className="flex items-center gap-3 mb-2">
@@ -46,14 +46,14 @@ export function ReplyItem({
             <AvatarFallback>{username.charAt(0)}</AvatarFallback>
           </Avatar>
           <div>
-            <h5 className="text-sm font-medium">{displayName}</h5>
-            <p className="text-xs text-gray-500">
+            <h5 className="text-sm font-medium text-gray-900 dark:text-gray-100">{displayName}</h5>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               {format(createdAt, "d 'de' MMM 'de' yyyy", { locale: ptBR })}
             </p>
           </div>
         </div>
         
-        <p className="text-gray-700 whitespace-pre-line">{content}</p>
+        <p className="text-gray-700 dark:text-gray-200 whitespace-pre-line">{content}</p>
         
         <div className="mt-2 flex justify-between items-center">
           <div>

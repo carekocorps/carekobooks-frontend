@@ -66,7 +66,7 @@ function AuthenticatedContent({ children }: { children: React.ReactNode }) {
             </Link>
 
             <div className="flex items-center gap-4 flex-wrap justify-center w-full sm:w-auto">
-              <NavBar />
+              <NavBar isAdmin={user?.roles?.includes("admin") ?? false} />
               <SearchBar />
 
               <Dropdown onLogout={logout}>

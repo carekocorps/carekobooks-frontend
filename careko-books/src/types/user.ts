@@ -4,6 +4,7 @@ export type UserType = {
   id: number;
   username: string;
   displayName: string;
+  roles?: string[];
   email: string;
   description: string; 
   isEnabled: boolean;
@@ -14,3 +15,5 @@ export type UserType = {
   followingCount: number;
   progressesCount: number;
 };
+
+export type ExtendedUserType = UserType & { roles?: string[] };

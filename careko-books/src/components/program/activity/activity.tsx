@@ -1,6 +1,7 @@
 import { Avatar } from "@/components/ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { BookActivity } from "@/types/activity";
+import Link from "next/link";
 
 type ActivityProps = {
   activity: BookActivity;
@@ -47,9 +48,10 @@ export default function Activity({ activity }: ActivityProps) {
           />
         </Avatar>
         <p className="text-gray-800 dark:text-gray-200 text-sm">
-          <strong>@{activity.user.username}</strong> {getAction()}{" "}
+           <Link href={`../user/${activity.user.username}`} className="no-underline">
+           <strong>@{activity.user.username}</strong></Link> {getAction()}{" "}
           <span className="text-blue-600 dark:text-blue-400">
-            {activity.book.title}
+           <Link href={`../books/${activity.book.id}`} className="no-underline"> {activity.book.title} </Link>
           </span>
         </p>
       </div>

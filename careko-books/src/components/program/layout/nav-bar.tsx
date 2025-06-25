@@ -9,12 +9,13 @@ import {
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
+import { AdminDropdown } from "./admin-dropdown";
+
 
 const navItems = [
   { label: "Home", href: "/", icon: "bi-house" },
   { label: "Explorar", href: "/auth", icon: "bi-compass" },
   { label: "Dashboard", href: "/dashboard", icon: "bi-speedometer2" },
-  { label: "Administrador", href: "/adm", icon: "bi-person-gear" },
 ];
 
 function NavItem({
@@ -44,7 +45,7 @@ function NavItem({
   );
 }
 
-export default function NavBar() {
+export default function NavBar({ isAdmin }: { isAdmin: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -64,6 +65,11 @@ export default function NavBar() {
           {navItems.map((item) => (
             <NavItem key={item.href} {...item} />
           ))}
+          <NavigationMenuItem>
+            {isAdmin && (
+              <AdminDropdown />
+            )}
+          </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
 
@@ -78,6 +84,9 @@ export default function NavBar() {
                   onClick={() => setIsOpen(false)}
                 />
               ))}
+              <NavigationMenuItem className="w-full">
+                <AdminDropdown isMobile />
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
         </div>

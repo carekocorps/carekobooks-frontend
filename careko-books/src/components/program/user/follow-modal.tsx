@@ -80,7 +80,7 @@ export default function FollowModal({
             <ul className="divide-y dark:divide-gray-700">
               {users.map((user) => (
                 <li key={user.username} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-900 transition">
-                  <Link href={`user/${user.username}`} className="no-underline">
+                  <Link href={`../user/${user.username}`} className="no-underline">
                   <div className="flex items-center gap-4">
                     <Avatar className="w-12 h-12">
                       <AvatarImage

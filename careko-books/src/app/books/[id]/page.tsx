@@ -6,6 +6,9 @@ import { ReviewActions } from "@/components/program/review/reviews";
 import { ThreadActions } from "@/components/program/threads/threads-actions";
 import { ThreadList } from "@/components/program/threads/threads-list";
 import { BookRatingVisualization } from "@/components/program/book/book-rating";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
+import { Card } from "@/components/ui/card";
+import { MessageSquare, PenSquare } from "lucide-react";
 
 interface BookDetailPageProps {
   params: { id: number }
@@ -83,16 +86,71 @@ export default async function BookDetailPage({ params }: any) {
         </aside>
 
         <div className="lg:col-span-2 mt-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-100">
-              Discussões
-            </h2>
-            <ThreadActions bookId={bookData.id} />
-          </div>
+          <Tabs defaultValue="discussions" className="w-full">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <TabsList className="bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
+                <TabsTrigger 
+                  value="discussions" 
+                  className="px-6 py-2 rounded-md transition-all data-[state=active]:bg-indigo-500 data-[state=active]:text-white"
+                >
+                  <div className="flex items-center gap-2">
+                    <MessageSquare size={18} />
+                    Discussões
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="reviews" 
+                  className="px-6 py-2 rounded-md transition-all data-[state=active]:bg-indigo-500 data-[state=active]:text-white"
+                >
+                  <div className="flex items-center gap-2">
+                    <PenSquare size={18} />
+                    Resenhas
+                  </div>
+                </TabsTrigger>
+              </TabsList>
+              
+              <div className="flex gap-3">
+                <ThreadActions bookId={bookData.id} />
+              </div>
+            </div>
 
-          <div className="bg-gradient-to-br from-white via-slate-50 to-white dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg dark:shadow-black/20 p-6 space-y-6">
-            <ThreadList bookId={bookData.id} />
-          </div>
+            <TabsContent value="discussions">
+              <Card className="bg-gradient-to-br from-white via-slate-50 to-white dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg dark:shadow-black/20 p-6 space-y-6">
+                <ThreadList bookId={bookData.id} />
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="reviews">
+              <Card className="bg-gradient-to-br from-white via-slate-50 to-white dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg dark:shadow-black/20 p-6">
+                <div className="flex flex-col items-center justify-center py-16">
+                  <PenSquare size={64} className="text-gray-400 dark:text-gray-500 mb-6" />
+                  <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-3">
+                    Resenhas em Desenvolvimento
+                  </h3>
+                  <p className="text-gray-500 dark:text-gray-400 text-center max-w-md mb-6">
+                    não grita
+                  </p>
+                  <div className="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-xl w-16 h-1 mb-6" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+                    {[1, 2].map((item) => (
+                      <div key={item} className="animate-pulse">
+                        <div className="flex items-start gap-4">
+                          <div className="bg-gray-200 dark:bg-gray-700 rounded-full w-12 h-12" />
+                          <div className="flex-1">
+                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2" />
+                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-3" />
+                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full mb-1" />
+                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-1" />
+                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </main>
