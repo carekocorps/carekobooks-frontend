@@ -21,4 +21,4 @@ jobs:
           NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID }}
           NEXT_PUBLIC_WS_URL: ${{ secrets.NEXT_PUBLIC_WS_URL }}
         working-directory: careko-books
-        run: docker compose up -d --build
+        run: docker compose up -d --build --force-recreate 

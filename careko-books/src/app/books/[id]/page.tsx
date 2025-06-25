@@ -32,6 +32,7 @@ export default async function BookDetailPage({ params }: any) {
             alt={bookData.title}
             width={260}
             height={380}
+            unoptimized
             className="rounded-2xl border border-gray-200 dark:border-gray-700 shadow-xl dark:shadow-black/20 object-cover transition-transform duration-300 hover:scale-105"
           />
         </div>
