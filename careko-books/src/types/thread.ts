@@ -24,26 +24,11 @@ export type UpdateThread = Partial<CreateThread> & { id: number };
 export type ThreadReply = {
   id: number;
   content: string;
-  createdAt: string;
+  createdAt?: string;
   updatedAt: string;
   user: UserType;
-  thread: {
-    id: number;
-    title: string;
-    description: string;
-    createdAt: string;
-    updatedAt: string;
-    user: UserType;
-    book: BookType;
-  };
-  parent?: {
-    id: number;
-    content: string;
-    createdAt: string;
-    updatedAt: string;
-    user: UserType;
-  };
-  children?: ThreadReply[];
+  parent: Thread;
+  replies?: ThreadReply[];
   isContainingChildren: boolean;
 };
 
