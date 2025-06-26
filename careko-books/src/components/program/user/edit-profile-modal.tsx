@@ -121,11 +121,16 @@ export default function UpdateUserModal({ username, children, onSuccess }: Updat
     setError(null);
     
     try {
-      await UserService.updateUser(username, {
+      const updateData = {
         ...formData,
-        image: image
-      });
-      
+        ...(image instanceof File ? { image } : {})
+      };
+
+      console.log(updateData)
+
+      await UserService.updateUser(username, updateData);
+
+
       setIsOpen(false);
       if (onSuccess) onSuccess();
     } catch (error) {
