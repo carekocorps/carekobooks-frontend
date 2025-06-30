@@ -18,6 +18,9 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { BookService } from "@/services/books.service";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Books() {
   const {
@@ -36,10 +39,23 @@ export default function Books() {
     initialOrderBy: "title",
   });
 
+  const { user } = useCurrentUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user && !user.roles?.includes("ADMIN")) {
+      router.replace("/");
+    }
+  }, [user, router]);
+
+  if (!user) {
+    return null;
+  }
+
   const sortingOptions = [
     { value: "title", label: "Título" },
-    { value: "author", label: "Autor" },
-    { value: "published-at", label: "Data de Criação" },
+    { value: "authorName", label: "Autor" },
+    { value: "publishedAt", label: "Data de Criação" },
   ];
 
   const handleClearCache = async () => {
@@ -53,6 +69,7 @@ export default function Books() {
   };
 
   return (
+    
     <main className="container mx-auto px-4 py-8 space-y-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <header className="space-y-6">
         {/* Título e ações */}

@@ -17,6 +17,9 @@ import { Button } from "@/components/ui/button";
 import { GenreService } from "@/services/genre.service";
 import { toast } from "sonner";
 import { SkeletonGenreCard } from "@/components/program/genre/skeleton-genre";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Genres() {
   const {
@@ -31,6 +34,19 @@ export default function Genres() {
     handleOrderChange,
     totalElements,
   } = useGenreQueries();
+
+  const { user } = useCurrentUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user && !user.roles?.includes("ADMIN")) {
+      router.replace("/");
+    }
+  }, [user, router]);
+
+  if (!user) {
+    return null;
+  }
 
   const sortingOptions = [
     { value: "name", label: "Nome" },

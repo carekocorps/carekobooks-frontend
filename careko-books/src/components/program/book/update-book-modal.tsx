@@ -1,18 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { BookService } from "@/services/books.service";
-
-import { CalendarIcon } from "lucide-react";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { DialogTrigger } from "@radix-ui/react-dialog";
-import { Button } from "@/components/ui/button";
+import { CalendarIcon, ImageIcon, ImagePlus, X } from "lucide-react";
 import { GenreType } from "@/types/genre";
 
 interface UpdateBookModalProps {
-  id : number;
+  id: number;
 }
 
 export default function UpdateBookModal({ id }: UpdateBookModalProps) {
@@ -26,56 +31,99 @@ export default function UpdateBookModal({ id }: UpdateBookModalProps) {
     pageCount: 0,
     genres: [] as string[],
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen && id) {
       setLoadingData(true);
       BookService.getBookById(id)
-        .then((response) => {
-          if (response.data) {
-            setFormData({
-              title: response.data.title || "",
-              synopsis: response.data.synopsis || "",
-              authorName: response.data.authorName || "",
-              publisherName: response.data.publisherName || "",
-              publishedAt: response.data.publishedAt || "",
-              pageCount: response.data.pageCount || 0,
-              genres: response.data.genres.map((g: GenreType) => g.name) || [],
-            });
+        .then(({ data }) => {
+          setFormData({
+            title: data.title || "",
+            synopsis: data.synopsis || "",
+            authorName: data.authorName || "",
+            publisherName: data.publisherName || "",
+            publishedAt: (data.publishedAt || "").split("T")[0],
+            pageCount: data.pageCount || 0,
+            genres: data.genres.map((g: GenreType) => g.name) || [],
+          });
+          if (data.coverUrl) {
+            setPreviewImage(data.coverUrl);
           }
         })
-        .catch((error) => {
-          console.error("Erro ao carregar livro:", error);
-        })
-        .finally(() => {
-          setLoadingData(false);
-        });
+        .catch(console.error)
+        .finally(() => setLoadingData(false));
     }
   }, [isOpen, id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === "pageCount" ? Number(value) : value
+      [name]: name === "pageCount" ? Number(value) : value,
     }));
   };
 
   const handleGenresChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
-      genres: e.target.value.split(",").map(g => g.trim())
+      genres: e.target.value.split(",").map(g => g.trim()),
     }));
+  };
+
+  const handleImageFile = (file: File | null) => {
+    setImageFile(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setPreviewImage(reader.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      setPreviewImage(null);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) handleImageFile(e.target.files[0]);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+  const handleDragLeave = () => setIsDragging(false);
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files?.[0]) handleImageFile(e.dataTransfer.files[0]);
+  };
+
+  const triggerFileSelect = () => fileInputRef.current?.click();
+  const removeImage = () => {
+    handleImageFile(null);
+    fileInputRef.current!.value = "";
   };
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await BookService.updateBook(id, formData);
+      await BookService.updateBook(id, {
+        ...formData,
+        publishedAt: formData.publishedAt || "",
+        genres: formData.genres,
+        image: imageFile,
+        retainCurrentImage: !imageFile, 
+      });
       setIsOpen(false);
+      setPreviewImage(null);
+      setImageFile(null);
       setFormData({
         title: "",
         synopsis: "",
@@ -97,80 +145,107 @@ export default function UpdateBookModal({ id }: UpdateBookModalProps) {
       <DialogTrigger asChild>
         <Button
           variant="ghost"
+          className="w-8 h-8 rounded-md p-0 border border-primary text-primary hover:bg-primary/10 transition"
           aria-label="Atualizar Livro"
-          className="w-8 h-8 rounded-md border border-primary bg-primary/10 text-primary p-0 
-                     flex items-center justify-center shadow-sm 
-                     transform transition-transform duration-200 hover:scale-105 hover:bg-primary/20
-                     dark:border-primary/40 dark:bg-primary/20 dark:hover:bg-primary/30 dark:text-primary-foreground"
         >
-          <i className="bi bi-pencil text-base"></i>
+          <i className="bi bi-pencil text-lg" />
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-2xl rounded-lg dark:bg-zinc-900 dark:text-zinc-100">
-        <DialogHeader className="border-b pb-4 dark:border-zinc-700">
-          <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
-            <i className="bi bi-book-plus"></i>
-            <span>Atualizar Um Livro</span>
+      <DialogContent className="max-w-3xl p-6 space-y-6 rounded-lg dark:bg-zinc-900">
+        <DialogHeader className="pb-2 border-b dark:border-zinc-700">
+          <DialogTitle className="text-2xl font-semibold text-primary flex items-center gap-2">
+            <i className="bi bi-bookmark-fill" /> Atualizar Livro
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-          <div className="space-y-4 md:col-span-1">
-            <div className="space-y-1">
-              <Label htmlFor="title" className="flex items-center gap-1 text-sm font-medium">
-                <i className="bi bi-bookmark text-primary"></i>
-                Título do Livro *
-              </Label>
+        <form onSubmit={handleUpdate} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-5">
+            <div>
+              <Label htmlFor="title">Título *</Label>
               <Input
                 id="title"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                placeholder="Digite o título completo"
                 required
-                className="border-gray-300 focus:border-primary dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-400"
+                className="mt-1"
               />
             </div>
-
-            <div className="space-y-1">
-              <Label htmlFor="authorName" className="flex items-center gap-1 text-sm font-medium">
-                <i className="bi bi-person text-primary"></i>
-                Autor *
-              </Label>
+            <div>
+              <Label htmlFor="authorName">Autor *</Label>
               <Input
                 id="authorName"
                 name="authorName"
                 value={formData.authorName}
                 onChange={handleChange}
-                placeholder="Nome completo do autor"
                 required
-                className="border-gray-300 focus:border-primary dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-400"
+                className="mt-1"
               />
             </div>
-
-            <div className="space-y-1">
-              <Label htmlFor="publisherName" className="flex items-center gap-1 text-sm font-medium">
-                <i className="bi bi-building text-primary"></i>
-                Editora *
-              </Label>
+            <div>
+              <Label htmlFor="publisherName">Editora *</Label>
               <Input
                 id="publisherName"
                 name="publisherName"
                 value={formData.publisherName}
                 onChange={handleChange}
-                placeholder="Nome da editora"
                 required
-                className="border-gray-300 focus:border-primary dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-400"
+                className="mt-1"
               />
             </div>
           </div>
 
-          <div className="space-y-4 md:col-span-1">
-            <div className="space-y-1">
-              <Label htmlFor="publishedAt" className="flex items-center gap-1 text-sm font-medium">
-                <CalendarIcon className="text-primary" />
-                Data de Publicação *
+          <div className="space-y-5">
+            <div>
+              <Label>Capa do Livro</Label>
+              <div
+                className={`mt-1 relative border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 cursor-pointer transition ${
+                  isDragging ? "border-primary bg-primary/10" : "border-zinc-300 hover:border-primary"
+                }`}
+                style={{ minHeight: previewImage ? "auto" : "140px" }}
+                onClick={triggerFileSelect}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+                {previewImage ? (
+                  <div className="relative group">
+                    <img
+                      src={previewImage}
+                      alt="Capa"
+                      className="w-32 h-48 object-cover rounded-md"
+                    />
+                    <div className="absolute inset-0 bg-black/40 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                      <ImagePlus className="w-6 h-6 text-white" />
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute top-2 right-2 text-red-500"
+                      onClick={e => { e.stopPropagation(); removeImage(); }}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center text-sm text-zinc-500">
+                    <ImageIcon className="mx-auto mb-2 w-8 h-8" />
+                    Arraste ou clique para trocar capa
+                  </div>
+                )}
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="publishedAt" className="flex items-center gap-1">
+                <CalendarIcon className="text-primary" /> Data de Publicação *
               </Label>
               <Input
                 id="publishedAt"
@@ -179,93 +254,62 @@ export default function UpdateBookModal({ id }: UpdateBookModalProps) {
                 value={formData.publishedAt}
                 onChange={handleChange}
                 required
-                className="border-gray-300 focus:border-primary dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+                className="mt-1"
               />
             </div>
+          </div>
 
-            <div className="space-y-1">
-              <Label htmlFor="pageCount" className="flex items-center gap-1 text-sm font-medium">
-                <i className="bi bi-file-text text-primary"></i>
-                Número de Páginas *
-              </Label>
+          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <Label htmlFor="pageCount">Páginas *</Label>
               <Input
                 id="pageCount"
                 name="pageCount"
                 type="number"
-                min="1"
-                value={formData.pageCount}
+                min={1}
+                value={formData.pageCount.toString()}
                 onChange={handleChange}
-                placeholder="Ex: 256"
                 required
-                className="border-gray-300 focus:border-primary dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+                className="mt-1"
               />
             </div>
-
-            <div className="space-y-1">
-              <Label htmlFor="genres" className="flex items-center gap-1 text-sm font-medium">
-                <i className="bi bi-tags text-primary"></i>
-                Gêneros
-              </Label>
+            <div>
+              <Label htmlFor="genres">Gêneros</Label>
               <Input
                 id="genres"
                 value={formData.genres.join(", ")}
                 onChange={handleGenresChange}
-                placeholder="Separe por vírgulas (Ex: Ficção, Aventura, Romance)"
-                className="border-gray-300 focus:border-primary dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-400"
+                placeholder="Ex: Romance, Aventura"
+                className="mt-1"
               />
-              <p className="text-xs text-muted-foreground dark:text-zinc-400">Máximo de 3 gêneros recomendados</p>
+              <p className="mt-1 text-xs text-zinc-500">Máx. 3 gêneros</p>
             </div>
           </div>
 
-          <div className="space-y-1 md:col-span-2">
-            <Label htmlFor="synopsis" className="flex items-center gap-1 text-sm font-medium">
-              <i className="bi bi-card-text text-primary"></i>
-              Sinopse *
-            </Label>
+          <div className="lg:col-span-2">
+            <Label htmlFor="synopsis">Sinopse *</Label>
             <Textarea
               id="synopsis"
               name="synopsis"
+              rows={5}
               value={formData.synopsis}
               onChange={handleChange}
-              placeholder="Descreva brevemente o enredo do livro"
               required
-              rows={4}
-              className="border-gray-300 focus:border-primary dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-400"
+              className="mt-1"
             />
-            <p className="text-xs text-muted-foreground dark:text-zinc-400">Mínimo de 100 caracteres</p>
           </div>
-
-          <Separator className="md:col-span-2 my-2 dark:bg-zinc-700" />
-
-          <DialogFooter className="md:col-span-2 flex justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsOpen(false)}
-              disabled={loading}
-              className="border-gray-300 hover:bg-gray-100 min-w-24 dark:border-zinc-600 dark:hover:bg-zinc-700"
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="bg-primary hover:bg-primary/90 min-w-24 flex items-center gap-2 dark:bg-primary dark:hover:bg-primary/80"
-            >
-              {loading ? (
-                <>
-                  <i className="bi bi-arrow-repeat animate-spin"></i>
-                  <span>Salvando...</span>
-                </>
-              ) : (
-                <>
-                  <i className="bi bi-check-lg"></i>
-                  <span>Salvar Livro</span>
-                </>
-              )}
-            </Button>
-          </DialogFooter>
         </form>
+
+        <Separator />
+
+        <DialogFooter className="flex justify-end space-x-3">
+          <Button variant="outline" onClick={() => setIsOpen(false)} disabled={loading}>
+            Cancelar
+          </Button>
+          <Button onClick={(e) => handleUpdate(e as any)} disabled={loading}>
+            {loading ? "Salvando..." : "Salvar Livro"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

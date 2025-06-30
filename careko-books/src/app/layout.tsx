@@ -16,6 +16,7 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 import NavBar from "@/components/program/layout/nav-bar";
 import SearchBar from "@/components/program/layout/search-bar";
 import Dropdown from "@/components/program/layout/dropdown";
+import Footer from "@/components/program/layout/footer";
 
 const tiltNeon = Tilt_Neon({
   variable: "--font-tilt-neon",
@@ -86,6 +87,8 @@ function AuthenticatedContent({ children }: { children: React.ReactNode }) {
         </nav>
 
         {children}
+
+        <Footer/>
 
         <Toaster
           richColors

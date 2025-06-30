@@ -32,6 +32,7 @@ export default function UpdateUserModal({ username, children, onSuccess }: Updat
   const [loadingData, setLoadingData] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [retainCurrentImage, setRetainCurrentImage] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -43,9 +44,10 @@ export default function UpdateUserModal({ username, children, onSuccess }: Updat
             setFormData({
               username: response.username || "",
               displayName: response.displayName || "",
-              description: response.description || "",
+              description: response.description || ""
             });
-            setCurrentImageUrl(response.image.url || null);
+            setCurrentImageUrl(response.image?.url || null);
+            setRetainCurrentImage(true); 
           }
         })
         .catch((error) => {
@@ -76,8 +78,10 @@ export default function UpdateUserModal({ username, children, onSuccess }: Updat
         setPreviewImage(reader.result as string);
       };
       reader.readAsDataURL(file);
+      setRetainCurrentImage(false); 
     } else {
       setPreviewImage(null);
+      setRetainCurrentImage(false); 
     }
   };
 
@@ -123,7 +127,8 @@ export default function UpdateUserModal({ username, children, onSuccess }: Updat
     try {
       await UserService.updateUser(username, {
         ...formData,
-        image: image
+        image: image,
+        retainCurrentImage: retainCurrentImage && !image
       });
       
       setIsOpen(false);
@@ -228,6 +233,21 @@ export default function UpdateUserModal({ username, children, onSuccess }: Updat
                     </div>
                   </div>
                 </div>
+                
+                {currentImageUrl && !image && (
+                  <div className="mt-4 flex items-center">
+                    <input
+                      type="checkbox"
+                      id="retainCurrentImage"
+                      checked={retainCurrentImage}
+                      onChange={(e) => setRetainCurrentImage(e.target.checked)}
+                      className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    />
+                    <label htmlFor="retainCurrentImage" className="ml-2 block text-sm text-gray-700">
+                      Manter imagem atual
+                    </label>
+                  </div>
+                )}
               </div>
               
               <div className="md:col-span-2 space-y-6">

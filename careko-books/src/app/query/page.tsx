@@ -39,13 +39,13 @@ export default function SearchResultsPage() {
   const sortingOptions = {
     books: [
       { value: "title", label: "Título" },
-      { value: "author-name", label: "Autor" },
-      { value: "published-at", label: "Data de Publicação" },
-      { value: "page-count", label: "Número de Páginas" },
+      { value: "authorName", label: "Autor" },
+      { value: "publishedAt", label: "Data de Publicação" },
+      { value: "pageCount", label: "Número de Páginas" },
     ],
     users: [
       { value: "username", label: "Nome de Usuário" },
-      { value: "published-at", label: "Data de Registro" },
+      { value: "publishedAt", label: "Data de Registro" },
     ],
   };
 

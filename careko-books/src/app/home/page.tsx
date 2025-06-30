@@ -200,7 +200,7 @@ export default function HomeContent() {
                 <i className="bi bi-activity text-indigo-600 dark:text-indigo-300 text-lg" />
               </div>
               <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-                Atividades dos Seguidos
+                Atividades Recentes
               </h2>
             </div>
 
