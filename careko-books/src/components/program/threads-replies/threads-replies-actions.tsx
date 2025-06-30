@@ -46,7 +46,6 @@ export function ThreadReplyActions({ threadId, parentId, existingReply, onSucces
         content,
         username: user.username,
         threadId,
-        parentId: parentId || undefined
       };
 
       if (existingReply) {
@@ -113,7 +112,7 @@ export function ThreadReplyActions({ threadId, parentId, existingReply, onSucces
         ) : (
           <Button 
             variant="outline" 
-            className="text-gray-700"
+            className="text-gray-700 dark:text-gray-200"
           >
             <CornerUpLeft className="w-4 h-4 mr-2" />
             Responder

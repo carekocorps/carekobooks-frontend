@@ -77,34 +77,13 @@ export const ThreadService = {
     return res.data;
   },
 
-  getRepliesByThread: async (threadId: number) => {
-    const replies = await ThreadService.searchReplies({
-      threadId,
-      pageSize: 100
-    });
-    
-    const replyMap = new Map<number, ThreadReply>();
-    const rootReplies: ThreadReply[] = [];
-    
-    replies.forEach(reply => {
-      replyMap.set(reply.id, reply);
-      
-      if (!reply.parent?.id) {
-        rootReplies.push(reply);
-      }
-    });
-    
-    return rootReplies;
-  },
-
-  getFirstLevelReplies: async (threadId: number, parentId?: number) => {
+  getFirstLevelReplies: async ( parentId?: number) => {
     const res = await api.get<{
       content: ThreadReply[];
       totalPages: number;
       totalElements: number;
     }>("/api/v1/books/threads/replies", {
       params: {
-        threadId,
         parentId,
         pageSize: 100,
         sort: "createdAt,asc"

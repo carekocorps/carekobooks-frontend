@@ -4,13 +4,13 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "s3.carekobooks.space",
+        hostname: process.env.NEXT_PUBLIC_MINIO_URL,
         pathname: "/images/**",
       },
     ],
   },
   async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.carekobooks.space';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     
     return [
       {

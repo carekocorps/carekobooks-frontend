@@ -102,7 +102,7 @@ export function useThreads(bookId: number) {
       }));
     } else {
       try {
-        const children = await ThreadService.getFirstLevelReplies(threadId, parentReplyId);
+        const children = await ThreadService.getFirstLevelReplies(threadId);
         const hasMore = await ThreadService.hasChildReplies(parentReplyId);
         
         setThreadsState(prev => ({
@@ -125,39 +125,43 @@ export function useThreads(bookId: number) {
     }
   }, [threadsState]);
 
-  const handleReplySuccess = useCallback(async (threadId: number, parentId?: number) => {
-    try {
-      if (parentId) {
-        const children = await ThreadService.getFirstLevelReplies(threadId, parentId);
-        const hasMore = await ThreadService.hasChildReplies(parentId);
-        
-        setThreadsState(prev => ({
-          ...prev,
-          [threadId]: {
-            ...prev[threadId],
-            childrenMap: {
-              ...prev[threadId].childrenMap,
-              [parentId]: {
-                replies: children,
-                hasChildren: hasMore
-              }
-            }
-          }
-        }));
-      } else {
-        const replies = await ThreadService.getFirstLevelReplies(threadId);
-        setThreadsState(prev => ({
-          ...prev,
-          [threadId]: {
-            ...prev[threadId],
-            replies
-          }
-        }));
-      }
-    } catch (err) {
-      console.error("Erro ao atualizar respostas", err);
+  const handleReplySuccess = useCallback((threadId: number, newReply: ThreadReply, parentId?: number) => {
+  setThreadsState(prev => {
+    const currentThread = prev[threadId] || {
+      expanded: true,
+      replies: [],
+      childrenMap: {}
+    };
+    
+    if (!parentId) {
+      return {
+        ...prev,
+        [threadId]: {
+          ...currentThread,
+          replies: [...currentThread.replies, newReply]
+        }
+      };
     }
-  }, []);
+    const currentChildrenMap = currentThread.childrenMap[parentId] || {
+      replies: [],
+      hasChildren: true
+    };
+
+    return {
+      ...prev,
+      [threadId]: {
+        ...currentThread,
+        childrenMap: {
+          ...currentThread.childrenMap,
+          [parentId]: {
+            ...currentChildrenMap,
+            replies: [...currentChildrenMap.replies, newReply]
+          }
+        }
+      }
+    };
+  });
+}, []);
 
   return {
     threads,

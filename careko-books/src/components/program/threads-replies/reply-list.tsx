@@ -3,8 +3,6 @@
 import { ThreadReply } from "@/types/thread";
 import { ReplyItem } from "./reply-item";
 
-
-
 interface ReplyListProps {
   threadId: number;
   replies: ThreadReply[];
@@ -33,7 +31,7 @@ export function ReplyList({
 
         return (
           <ReplyItem
-            key={reply.id}
+            key={`reply-${reply.id}`}
             reply={reply}
             threadId={threadId}
             depth={0}
