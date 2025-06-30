@@ -26,7 +26,7 @@ export const UserService = {
     username?: string; 
     displayName?: string; 
     description?: string;
-    image?: File;
+    image?: File | null;
   }): Promise<UserType> => {
     const formData = new FormData();
     const userData = {
@@ -43,6 +43,12 @@ export const UserService = {
         throw new Error("Apenas imagens JPEG, PNG, GIF ou WebP são permitidas");
       }
       formData.append("image", data.image, data.image.name);
+    } else {
+      formData.append(
+        "image", 
+        new Blob([], { type: "image/png" }), 
+        "empty.png"
+      );
     }
 
     const response = await api.put(`/api/v1/users/${username}`, formData, {
