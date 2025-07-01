@@ -35,11 +35,11 @@ export const ActivityService = {
   },
 
   connectWebSocket(username: string, callback: (activity: BookActivity) => void): WebSocket {
-    if (!process.env.NEXT_PUBLIC_WS_URL) {
+    if (!process.env.NEXT_PUBLIC_API_WEBSOCKET_URL) {
       throw new Error("WebSocket URL not configured");
     }
     
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL;
+    const wsUrl = process.env.NEXT_PUBLIC_API_WEBSOCKET_URL;
     const ws = new WebSocket(wsUrl);
     
     ws.onopen = () => {
