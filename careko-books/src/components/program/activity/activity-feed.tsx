@@ -8,12 +8,12 @@ interface ActivityFeedProps {
 
 export default function ActivityFeed({ activities, loading }: ActivityFeedProps) {
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg rounded-2xl p-6">
+    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg lg:w-[25rem] h-[28rem] rounded-2xl p-6">
       <h1 className="text-white text-2xl font-bold mb-6 text-center">
         Mural de Atividades
       </h1>
 
-      <div className="space-y-4 max-h-[500px] overflow-y-auto px-2">
+      <div className="space-y-4 h-[21rem] overflow-y-auto px-2">
         {loading ? (
           Array.from({ length: 3 }).map((_, index) => (
             <div key={index} className="w-full bg-white/80 dark:bg-gray-800 rounded-xl flex flex-col shadow-md p-4 gap-2 border border-gray-100 dark:border-gray-700 animate-pulse mx-auto">

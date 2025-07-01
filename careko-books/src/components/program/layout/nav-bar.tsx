@@ -14,7 +14,7 @@ import { AdminDropdown } from "./admin-dropdown";
 
 const navItems = [
   { label: "Home", href: "/", icon: "bi-house" },
-  { label: "Explorar", href: "/auth", icon: "bi-compass" },
+  { label: "Explorar", href: "/explore", icon: "bi-compass" },
   { label: "Dashboard", href: "/dashboard", icon: "bi-speedometer2" },
 ];
 

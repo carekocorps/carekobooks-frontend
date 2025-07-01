@@ -26,7 +26,7 @@ export default function Book({ bookItem, isAdmin = false, onDeleted }: BookProps
     >
       <div className="relative w-40 h-50 shadow-md dark:shadow-black/50">
         <Image
-          src={bookItem.image?.url}
+          src={bookItem.image?.url ?? '/placeholder-book.png'}
           alt={`Capa do livro ${bookItem.title}`}
           fill
           unoptimized

@@ -39,7 +39,7 @@ export default function Genres() {
   const router = useRouter();
 
   useEffect(() => {
-    if (user && !user.roles?.includes("ADMIN")) {
+    if (user && !user.roles?.includes("admin")) {
       router.replace("/");
     }
   }, [user, router]);

@@ -25,7 +25,7 @@ export default function ProfileHeader({
   onProfileUpdated, 
 }: ProfileHeaderProps) {
   return (
-    <div className="bg-white dark:bg-gray-900 shadow-lg w-full lg:w-2/5 rounded-2xl relative overflow-visible flex flex-col items-center gap-5 pt-24 pb-8 px-6 border border-gray-100 dark:border-gray-800 mx-auto">
+    <div className="bg-white dark:bg-gray-900 shadow-lg w-full lg:w-[30rem] h-[28rem] rounded-2xl relative overflow-visible flex flex-col items-center gap-5 pt-24 pb-8 px-6 border border-gray-100 dark:border-gray-800 mx-auto">
       <div className="absolute -top-16 left-1/2 transform -translate-x-1/2">
         <Avatar className="w-32 h-32 border-4 border-white dark:border-gray-900 shadow-lg">
           <AvatarImage

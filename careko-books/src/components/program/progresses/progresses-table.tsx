@@ -8,19 +8,15 @@ import { useState } from "react";
 import { PaginationDemo } from "@/components/program/utils/pagination-demo";
 
 interface ProgressTableProps {
-    username: string;
+  username: string;
 }
 
-export default function ViewProgressTable({ username } : ProgressTableProps) {
+export default function ViewProgressTable({ username }: ProgressTableProps) {
   const [readStatus, setReadStatus] = useState<ProgressStatus>("READING");
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
 
-  const { 
-    count, 
-    progresses, 
-    totalPages
-  } = useStatusProgresses({
+  const { count, progresses, totalPages } = useStatusProgresses({
     username: username,
     status: readStatus,
     page,
@@ -33,45 +29,58 @@ export default function ViewProgressTable({ username } : ProgressTableProps) {
     FINISHED: "Lidos"
   };
 
-  return(
-    <main className="max-w-5xl mx-auto px-1 py-8 bg-white dark:bg-gray-900 shadow-lg rounded-2xl relative overflow-visible flex flex-col items-center border border-gray-100 dark:border-gray-800 ">
+  const statusToTabValue = {
+    READING: "reading",
+    PLANS_TO_READ: "want",
+    FINISHED: "finished"
+  };
+
+  const tabValueToStatus = {
+    reading: "READING",
+    want: "PLANS_TO_READ",
+    finished: "FINISHED"
+  } as const;
+
+  return (
+    <main className="max-w-5xl mx-auto px-10 py-8 bg-white dark:bg-gray-900 shadow-lg rounded-2xl relative overflow-visible flex flex-col items-center border border-gray-100 dark:border-gray-800 ">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white items-start">
             Livros {statusTitles[readStatus]}
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
-            {count > 0 
-              ? `${count} livro${count > 1 ? 's' : ''} encontrado${count > 1 ? 's' : ''}` 
+            {count > 0
+              ? `${count} livro${count > 1 ? 's' : ''} encontrado${count > 1 ? 's' : ''}`
               : 'Nenhum livro encontrado'}
           </p>
         </div>
       </div>
 
       <Tabs
-        value={readStatus.toLowerCase()}
-        onValueChange={(value) => {
-          if (value === "reading") setReadStatus("READING");
-          if (value === "want") setReadStatus("PLANS_TO_READ");
-          if (value === "finished") setReadStatus("FINISHED");
-          setPage(1);
+        value={statusToTabValue[readStatus]}
+        onValueChange={(value: string) => {
+          if (value in tabValueToStatus) {
+            setReadStatus(tabValueToStatus[value as keyof typeof tabValueToStatus]);
+            setPage(1);
+          }
         }}
+
         className="mb-8"
       >
         <TabsList className="grid w-full grid-cols-3 max-w-xs bg-gray-100 dark:bg-gray-800">
-          <TabsTrigger 
+          <TabsTrigger
             value="reading"
             className="data-[state=active]:bg-indigo-500 data-[state=active]:text-white"
           >
             Lendo
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="want"
             className="data-[state=active]:bg-indigo-500 data-[state=active]:text-white"
           >
             Quero Ler
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="finished"
             className="data-[state=active]:bg-indigo-500 data-[state=active]:text-white"
           >
@@ -84,19 +93,16 @@ export default function ViewProgressTable({ username } : ProgressTableProps) {
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-10">
             {progresses.map(progress => (
-              <Book 
-                key={progress.id} 
-                bookItem={progress.book} 
-              />
+              <Book key={progress.id} bookItem={progress.book} />
             ))}
           </div>
-          
+
           {totalPages > 1 && (
             <div className="mt-6">
-              <PaginationDemo 
-                totalPages={totalPages} 
-                page={page} 
-                setPage={setPage} 
+              <PaginationDemo
+                totalPages={totalPages}
+                page={page}
+                setPage={setPage}
               />
             </div>
           )}
@@ -113,5 +119,5 @@ export default function ViewProgressTable({ username } : ProgressTableProps) {
         </div>
       )}
     </main>
-  )
+  );
 }

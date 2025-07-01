@@ -156,7 +156,8 @@ export default function ViewUserProfile() {
   return (
     <main className="p-4 md:p-8 mx-auto flex justify-center">
       <div className="w-full max-w-6xl flex-col lg:flex-row gap- mt-8 justify-center">
-        <div className="flex">
+        <div className="flex flex-col">
+          <div className="flex items-center">
             <ProfileHeader 
                user={user}
               isCurrentUser={isCurrentUserProfile}
@@ -170,6 +171,7 @@ export default function ViewUserProfile() {
 
           <div className="w-full lg:w-2/5 space-y-6 mx-auto">
             <ActivityFeed activities={activities} loading={loadingActivities} />
+          </div>
           </div>
         </div>
 
