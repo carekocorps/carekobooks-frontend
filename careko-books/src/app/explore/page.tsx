@@ -46,7 +46,7 @@ export default function ExploreBooks() {
           3, 
           '', 
           'userAverageScore', 
-          true 
+          false 
         );
         setFeaturedBooks(response.data.content);
       } catch (error) {
