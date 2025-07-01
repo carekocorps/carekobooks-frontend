@@ -93,7 +93,7 @@ export default function ViewProgressTable({ username }: ProgressTableProps) {
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-10">
             {progresses.map(progress => (
-              <Book key={progress.id} bookItem={progress.book} />
+              <Book key={progress.id} bookItem={progress.book} isProgress={true} score={progress.score} />
             ))}
           </div>
 

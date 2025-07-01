@@ -5,14 +5,17 @@ import { BookType } from "@/types/book";
 import UpdateBookModal from "./update-book-modal";
 import DeleteBookModal from "./delete-book-modal";
 import Link from "next/link";
+import { ScoreCircle } from "../utils/score-circle";
+import { ProgressActions } from "../progresses/progresses-actions";
 
 interface BookProps {
   bookItem: BookType;
   isAdmin?: boolean;
-  onDeleted?: () => void; 
+  isProgress?: boolean;
+  score?: number;
 }
 
-export default function Book({ bookItem, isAdmin = false, onDeleted }: BookProps) {
+export default function Book({ bookItem, isAdmin = false, isProgress = false, score }: BookProps) {
   const content = (
     <div
       className={`
@@ -22,6 +25,7 @@ export default function Book({ bookItem, isAdmin = false, onDeleted }: BookProps
         border-white/30 dark:border-gray-700
         shadow-md dark:shadow-black/30
         transition-transform duration-300 hover:scale-105
+        relative
       `}
     >
       <div className="relative w-40 h-50 shadow-md dark:shadow-black/50">
@@ -32,6 +36,12 @@ export default function Book({ bookItem, isAdmin = false, onDeleted }: BookProps
           unoptimized
           className="object-cover rounded-t-md"
         />
+        
+      {isProgress && score != null ? (
+          <div className="absolute -top-2 -right-2">
+            <ScoreCircle score={score ?? 0}/>
+          </div>
+      ) : null}
       </div>
 
       <h2 className="w-full h-10 text-sm text-center line-clamp-2 mb-1 text-gray-900 dark:text-gray-100">
@@ -41,7 +51,7 @@ export default function Book({ bookItem, isAdmin = false, onDeleted }: BookProps
       {isAdmin && (
         <div className="flex gap-2 justify-center items-center">
           <UpdateBookModal id={bookItem.id} />
-          <DeleteBookModal bookId={bookItem.id} onDeleted={onDeleted} />
+          <DeleteBookModal bookId={bookItem.id} />
         </div>
       )}
     </div>

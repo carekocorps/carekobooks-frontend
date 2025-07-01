@@ -11,9 +11,6 @@ import { Card } from "@/components/ui/card";
 import { MessageSquare, PenSquare } from "lucide-react";
 import { ReviewList } from "@/components/program/review/reviews-list";
 
-interface BookDetailPageProps {
-  params: { id: number }
-}
 
 export default async function BookDetailPage({ params }: any) {
   const bookId = Number(params.id);
@@ -81,8 +78,8 @@ export default async function BookDetailPage({ params }: any) {
 
         <aside className="lg:col-span-2">
           <BookRatingVisualization 
-            userAverageScore={bookData.userAverageScore} 
-         
+            userAverageScore ={bookData.userAverageScore} 
+            reviewAverageScore={bookData.reviewAverageScore}
           />
         </aside>
 

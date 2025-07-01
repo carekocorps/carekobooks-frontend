@@ -53,6 +53,12 @@ export function ProgressActions({ bookId }: Props) {
     if (!existingProgress) resetForm();
   };
 
+  const handleScoreChange = (value: string) => {
+    if (value === "") return null;
+    const num = parseInt(value);
+    return isNaN(num) ? null : Math.min(100, Math.max(0, num));
+  };
+
   if (!user || isProgressLoading) return null;
 
   return (
@@ -125,10 +131,12 @@ export function ProgressActions({ bookId }: Props) {
                 <Input
                   id="score"
                   type="number"
-                  min="0"
-                  max="100"
-                  value={formData.score}
-                  onChange={(e) => handleInputChange("score", parseInt(e.target.value) || 0)}
+                  max={100}
+                  value={formData.score ?? ""}
+                  onChange={(e) => {
+                    handleInputChange("score", handleScoreChange(e.target.value));
+                  }}
+                  placeholder="0-100"
                 />
               </div>
 
@@ -136,7 +144,6 @@ export function ProgressActions({ bookId }: Props) {
                 <Label htmlFor="pageCount">Páginas Lidas</Label>
                 <Input
                   id="pageCount"
-                  type="number"
                   min="0"
                   value={formData.pageCount}
                   onChange={(e) => handleInputChange("pageCount", parseInt(e.target.value) || 0)}

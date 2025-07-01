@@ -23,7 +23,7 @@ interface ThreadItemProps {
   onToggleChildReplies: (parentReplyId: number) => void;
 }
 
-export function ThreadItem({ 
+export default function ThreadItem({ 
   thread, 
   threadState,
   onToggleReplies,

@@ -1,6 +1,4 @@
 "use client";
-
-import { ArrowUp, ArrowDown, Star, BookOpen, Flame } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -13,9 +11,6 @@ import Book from "@/components/program/book/book";
 import { useQueries } from "@/hooks/useQueries";
 import CarouselBooks from "@/components/program/book/books-carousel";
 import { SkeletonCard } from "@/components/program/book/skeleton-card";
-import { useState, useEffect } from "react";
-import { BookType } from "@/types/book";
-import { BookService } from "@/services/books.service";
 
 export default function ExploreBooks() {
   const {
@@ -34,31 +29,6 @@ export default function ExploreBooks() {
     initialOrderBy: "title",
   });
 
-  const [featuredBooks, setFeaturedBooks] = useState<BookType[]>([]);
-  const [loadingTop, setLoadingTop] = useState(true);
-
-  useEffect(() => {
-    const fetchTopBooks = async () => {
-      setLoadingTop(true);
-      try {
-        const response = await BookService.getBooks(
-          1, 
-          3, 
-          '', 
-          'userAverageScore', 
-          false 
-        );
-        setFeaturedBooks(response.data.content);
-      } catch (error) {
-        console.error("Erro ao buscar livros em destaque:", error);
-      } finally {
-        setLoadingTop(false);
-      }
-    };
-
-    fetchTopBooks();
-  }, []);
-
   const top3ThisPage = [...books]
     .filter(book => book.userAverageScore !== undefined)
     .sort((a, b) => (b.userAverageScore ?? 0) - (a.userAverageScore ?? 0))
@@ -66,27 +36,6 @@ export default function ExploreBooks() {
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <section className="mb-10">
-        <div className="flex items-center gap-2 mb-4">
-          <h2 className="text-2xl font-bold">Livros em Alta</h2>
-        </div>
-        
-        {loadingTop ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {[...Array(3)].map((_, index) => (
-              <SkeletonCard key={index} />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {featuredBooks.map((book) => (
-              <div key={book.id} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-[1.02]">
-                <Book bookItem={book} />
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
 
       <div className="flex flex-col md:flex-row gap-6">
         <div className="flex-1">
@@ -118,25 +67,6 @@ export default function ExploreBooks() {
               </Select>
             </div>
           </header>
-
-          {top3ThisPage.length > 0 && (
-            <section className="mb-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 rounded-xl">
-              <div className="flex items-center gap-2 mb-4">
-                <Star className="text-amber-500 fill-amber-500" size={20} />
-                <h3 className="text-lg font-bold">Top 3 desta página</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {top3ThisPage.map((book) => (
-                  <div
-                    key={book.id}
-                    className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-md transform transition-transform hover:scale-[1.02]"
-                  >
-                    <Book bookItem={book} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
 
           <section aria-live="polite" aria-busy={loading}>
             {loading ? (
