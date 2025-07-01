@@ -125,7 +125,7 @@ export function useThreads(bookId: number) {
     }
   }, [threadsState]);
 
-  const handleReplySuccess = useCallback((threadId: number, newReply: ThreadReply, parentId?: number) => {
+  const handleReplySuccess = useCallback((threadId: number) => {
   setThreadsState(prev => {
     const currentThread = prev[threadId] || {
       expanded: true,
@@ -133,16 +133,16 @@ export function useThreads(bookId: number) {
       childrenMap: {}
     };
     
-    if (!parentId) {
+    if (!threadId) {
       return {
         ...prev,
         [threadId]: {
           ...currentThread,
-          replies: [...currentThread.replies, newReply]
+          replies: [...currentThread.replies]
         }
       };
     }
-    const currentChildrenMap = currentThread.childrenMap[parentId] || {
+    const currentChildrenMap = currentThread.childrenMap[threadId] || {
       replies: [],
       hasChildren: true
     };
@@ -153,9 +153,9 @@ export function useThreads(bookId: number) {
         ...currentThread,
         childrenMap: {
           ...currentThread.childrenMap,
-          [parentId]: {
+          [threadId]: {
             ...currentChildrenMap,
-            replies: [...currentChildrenMap.replies, newReply]
+            replies: [...currentChildrenMap.replies]
           }
         }
       }

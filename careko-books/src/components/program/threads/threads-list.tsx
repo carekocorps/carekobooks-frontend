@@ -73,7 +73,7 @@ export function ThreadList({ bookId }: Props) {
             thread={thread}
             threadState={threadState}
             onToggleReplies={() => toggleThreadReplies(thread.id)}
-            onReplySuccess={(parentId) => handleReplySuccess(thread.id, parentId)}
+            onReplySuccess={(parentId) => handleReplySuccess(thread.id)}
             onToggleChildReplies={(parentReplyId) => toggleReplyChildren(thread.id, parentReplyId)}
           />
         );
