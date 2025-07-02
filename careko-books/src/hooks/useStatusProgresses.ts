@@ -2,7 +2,7 @@ import { ProgressService } from '@/services/progress.service';
 import { useState, useEffect } from 'react';
 import { BookProgress } from '@/types/bookProgress'; 
 
-export type ProgressStatus = "PLANS_TO_READ" | "READING" | "FINISHED";
+export type ProgressStatus = "PLANS_TO_READ" | "READING" | "FINISHED" | "FAVORITES";
 
 interface UseStatusProgressesOptions {
   username: string | null | undefined;
@@ -37,15 +37,20 @@ export const useStatusProgresses = ({
         setLoading(true);
         setError(null);
         
+        const filters: any = { username };
+        
+        if (status !== "FAVORITES") {
+          filters.status = status;
+        } else {
+          filters.isFavorite = true;
+        }
+
         const response = await ProgressService.getProgresses(
           page, 
           perPage, 
           'createdAt',
-          false,       
-          { 
-            username, 
-            status 
-          }
+          false,
+          filters
         );
 
         setCount(response.pageable.totalElements);

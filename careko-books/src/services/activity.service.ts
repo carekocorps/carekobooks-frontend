@@ -2,7 +2,12 @@ import { BookActivity, ActivityFilterParams, ActivityResponse } from "@/types/ac
 import api from "./api";
 
 export const ActivityService = {
-  async getActivities(params: ActivityFilterParams): Promise<ActivityResponse> {
+
+  deleteActivity: async (id: number) => {
+      return api.delete(`/api/v1/books/activities/${id}`);
+  },
+
+  async getActivities(params: ActivityFilterParams) {
     try {
       const response = await api.get("/api/v1/books/activities", { 
         params: {
@@ -18,7 +23,7 @@ export const ActivityService = {
     }
   },
 
-  async getFollowedFeedActivities(params: ActivityFilterParams): Promise<ActivityResponse> {
+  async getFollowedFeedActivities(params: ActivityFilterParams) {
     try {
       const response = await api.get("/api/v1/books/activities/social/feed", { 
         params: {

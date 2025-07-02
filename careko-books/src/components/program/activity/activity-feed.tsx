@@ -1,12 +1,23 @@
+"use client";
+
 import Activity from "@/components/program/activity/activity";
 import { BookActivity } from "@/types/activity";
 
 interface ActivityFeedProps {
   activities: BookActivity[];
   loading: boolean;
+  currentUsername?: string;
+  onDeleteActivity?: (id: number) => Promise<void>; 
+  deletingId?: number | null;
 }
 
-export default function ActivityFeed({ activities, loading }: ActivityFeedProps) {
+export default function ActivityFeed({ 
+  activities, 
+  loading, 
+  currentUsername,
+  onDeleteActivity,
+  deletingId
+}: ActivityFeedProps) {
   return (
     <div className="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg lg:w-[25rem] h-[28rem] rounded-2xl p-6">
       <h1 className="text-white text-2xl font-bold mb-6 text-center">
@@ -27,7 +38,13 @@ export default function ActivityFeed({ activities, loading }: ActivityFeedProps)
         ) : activities.length > 0 ? (
           activities.map(activity => (
             <div key={activity.id} className="mx-auto">
-              <Activity activity={activity} />
+              <Activity 
+                key={activity.id}
+                activity={activity} 
+                isCurrentUser={currentUsername === activity.user.username}
+                onDelete={onDeleteActivity}
+                isDeleting={deletingId === activity.id}
+              />
             </div>
           ))
         ) : (

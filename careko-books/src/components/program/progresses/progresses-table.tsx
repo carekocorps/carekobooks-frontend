@@ -2,7 +2,7 @@
 
 import Book from "@/components/program/book/book";
 import { ProgressStatus, useStatusProgresses } from "@/hooks/useStatusProgresses";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Heart } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { PaginationDemo } from "@/components/program/utils/pagination-demo";
@@ -12,13 +12,13 @@ interface ProgressTableProps {
 }
 
 export default function ViewProgressTable({ username }: ProgressTableProps) {
-  const [readStatus, setReadStatus] = useState<ProgressStatus>("READING");
+  const [viewStatus, setViewStatus] = useState<ProgressStatus>("READING");
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
 
   const { count, progresses, totalPages } = useStatusProgresses({
     username: username,
-    status: readStatus,
+    status: viewStatus,
     page,
     perPage: itemsPerPage
   });
@@ -26,19 +26,22 @@ export default function ViewProgressTable({ username }: ProgressTableProps) {
   const statusTitles = {
     READING: "em Leitura",
     PLANS_TO_READ: "Quero Ler",
-    FINISHED: "Lidos"
+    FINISHED: "Lidos",
+    FAVORITES: "Favoritos"
   };
 
   const statusToTabValue = {
     READING: "reading",
     PLANS_TO_READ: "want",
-    FINISHED: "finished"
+    FINISHED: "finished",
+    FAVORITES: "favorites"
   };
 
   const tabValueToStatus = {
     reading: "READING",
     want: "PLANS_TO_READ",
-    finished: "FINISHED"
+    finished: "FINISHED",
+    favorites: "FAVORITES"
   } as const;
 
   return (
@@ -46,7 +49,7 @@ export default function ViewProgressTable({ username }: ProgressTableProps) {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white items-start">
-            Livros {statusTitles[readStatus]}
+            Livros {statusTitles[viewStatus]}
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
             {count > 0
@@ -57,17 +60,16 @@ export default function ViewProgressTable({ username }: ProgressTableProps) {
       </div>
 
       <Tabs
-        value={statusToTabValue[readStatus]}
+        value={statusToTabValue[viewStatus]}
         onValueChange={(value: string) => {
           if (value in tabValueToStatus) {
-            setReadStatus(tabValueToStatus[value as keyof typeof tabValueToStatus]);
+            setViewStatus(tabValueToStatus[value as keyof typeof tabValueToStatus]);
             setPage(1);
           }
         }}
-
         className="mb-8"
       >
-        <TabsList className="grid w-full grid-cols-3 max-w-xs bg-gray-100 dark:bg-gray-800">
+        <TabsList className="grid w-full grid-cols-4 max-w-md bg-gray-100 dark:bg-gray-800">
           <TabsTrigger
             value="reading"
             className="data-[state=active]:bg-indigo-500 data-[state=active]:text-white"
@@ -86,6 +88,12 @@ export default function ViewProgressTable({ username }: ProgressTableProps) {
           >
             Lidos
           </TabsTrigger>
+          <TabsTrigger
+            value="favorites"
+            className="data-[state=active]:bg-indigo-500 data-[state=active]:text-white flex items-center gap-1"
+          >
+             Favoritos
+          </TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -93,7 +101,12 @@ export default function ViewProgressTable({ username }: ProgressTableProps) {
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-10">
             {progresses.map(progress => (
-              <Book key={progress.id} bookItem={progress.book} isProgress={true} score={progress.score} />
+              <Book 
+                key={progress.id} 
+                bookItem={progress.book} 
+                isProgress={true} 
+                score={progress.score}
+              />
             ))}
           </div>
 
@@ -109,12 +122,20 @@ export default function ViewProgressTable({ username }: ProgressTableProps) {
         </>
       ) : (
         <div className="flex flex-col items-center justify-center py-16 p-20 border-2 border-dashed rounded-2xl bg-gray-50 dark:bg-gray-800/50 dark:border-gray-700">
-          <BookOpen className="h-16 w-16 text-gray-400 dark:text-gray-500 mb-4" />
+          {viewStatus === "FAVORITES" ? (
+            <Heart className="h-16 w-16 text-gray-400 dark:text-gray-500 mb-4" />
+          ) : (
+            <BookOpen className="h-16 w-16 text-gray-400 dark:text-gray-500 mb-4" />
+          )}
           <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-2">
-            Nenhum livro encontrado
+            {viewStatus === "FAVORITES" 
+              ? "Nenhum livro favoritado" 
+              : "Nenhum livro encontrado"}
           </h3>
           <p className="text-gray-500 dark:text-gray-400 text-center max-w-md mb-6">
-            Este Usuário não realizou progresso nesta secção!
+            {viewStatus === "FAVORITES"
+              ? "Este usuário ainda não favoritou nenhum livro!"
+              : "Este usuário não realizou progresso nesta secção!"}
           </p>
         </div>
       )}

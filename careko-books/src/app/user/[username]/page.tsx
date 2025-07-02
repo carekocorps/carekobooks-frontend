@@ -15,6 +15,7 @@ import UserNotFoundState from "@/components/program/utils/user-not-found";
 import ActivityFeed from "@/components/program/activity/activity-feed";
 import FollowModal from "@/components/program/user/follow-modal";
 import ViewProgressTable from "@/components/program/progresses/progresses-table";
+import { toast } from "sonner";
 
 
 export default function ViewUserProfile() {
@@ -25,6 +26,7 @@ export default function ViewUserProfile() {
   const [user, setUser] = useState<UserType | null>(null);
   const [activities, setActivities] = useState<BookActivity[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -94,6 +96,20 @@ export default function ViewUserProfile() {
       console.error("Error loading activities:", error);
     } finally {
       setLoadingActivities(false);
+    }
+  };
+
+  const handleDeleteActivity = async (activityId: number) => {
+    setDeletingId(activityId);
+    try {
+      await ActivityService.deleteActivity(activityId);
+      setActivities(prev => prev.filter(a => a.id !== activityId));
+      toast.success("Atividade removida com sucesso");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Erro ao remover atividade");
+      await fetchActivities(); 
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -170,7 +186,13 @@ export default function ViewUserProfile() {
           />
 
           <div className="w-full lg:w-2/5 space-y-6 mx-auto">
-            <ActivityFeed activities={activities} loading={loadingActivities} />
+            <ActivityFeed 
+            activities={activities} 
+            loading={loadingActivities}
+            currentUsername={currentUser?.username}
+            onDeleteActivity={handleDeleteActivity}
+            deletingId={deletingId}
+             />
           </div>
           </div>
         </div>

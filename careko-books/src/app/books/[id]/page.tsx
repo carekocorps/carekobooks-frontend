@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { Card } from "@/components/ui/card";
 import { MessageSquare, PenSquare } from "lucide-react";
 import { ReviewList } from "@/components/program/review/reviews-list";
+import { GenreType } from "@/types/genre";
+import FavoriteButton from "@/components/program/progresses/favorite-button";
 
 
 export default async function BookDetailPage({ params }: any) {
@@ -59,6 +61,11 @@ export default async function BookDetailPage({ params }: any) {
               <span className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 px-4 py-1 rounded-full font-medium shadow-sm">
                 Editora: {bookData.publisherName}
               </span>
+               {bookData.genres && bookData.genres.length > 0 && (
+                  <span className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 px-4 py-1 rounded-full font-medium shadow-sm">
+                    Gêneros: {bookData.genres.map((genre: GenreType) => genre.displayName).join(', ')}
+                  </span>
+                )}
             </div>
 
             <p className="text-gray-800 dark:text-gray-200 text-justify leading-relaxed text-[1.05rem] break-words">
@@ -73,6 +80,10 @@ export default async function BookDetailPage({ params }: any) {
             <div>
               <ReviewActions bookId={bookData.id} />
             </div>
+            <FavoriteButton 
+              bookId={bookData.id} 
+              initialIsFavorite={false} 
+            />
           </div>
         </div>
 
