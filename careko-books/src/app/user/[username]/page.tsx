@@ -33,9 +33,10 @@ export default function ViewUserProfile() {
   const [modalOpen, setModalOpen] = useState<"seguidores" | "seguindo" | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [loadingFollow, setLoadingFollow] = useState(false);
-  const [followers, setFollowers] = useState<any[]>([]);
-  const [following, setFollowing] = useState<any[]>([]);
-  
+  const [followers, setFollowers] = useState<UserType[]>([]);
+  const [following, setFollowing] = useState<UserType[]>([]);
+
+
   const isCurrentUserProfile = currentUser?.username === username;
 
   const fetchUserData = async () => {
@@ -47,12 +48,13 @@ export default function ViewUserProfile() {
       if (!isCurrentUserProfile) {
         const response = await UserSocialService.getFollowing(currentUser?.username ?? "", { pageSize: 100 });
         const seguidos = response.data.content;
-        const segue = seguidos.some((u: any) => u.username === username);
+        const segue = seguidos.some((u: UserType) => u.username === username);
         setIsFollowing(segue);
       }
 
       setError(null);
     } catch (err) {
+      console.log(err)
       setError("Usuário não encontrado");
     } finally {
       setLoading(false);
@@ -105,13 +107,26 @@ export default function ViewUserProfile() {
       await ActivityService.deleteActivity(activityId);
       setActivities(prev => prev.filter(a => a.id !== activityId));
       toast.success("Atividade removida com sucesso");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Erro ao remover atividade");
-      await fetchActivities(); 
+    } catch (error: unknown) {
+      if (
+          typeof error === "object" &&
+          error !== null &&
+          "response" in error &&
+          typeof (error as { response?: unknown }).response === "object" &&
+          (error as { response?: { data?: { message?: string } } }).response?.data?.message
+      ) {
+        const message = (error as { response: { data: { message: string } } }).response.data.message;
+        toast.error(message);
+      } else {
+        toast.error("Erro desconhecido ao remover atividade");
+      }
+      await fetchActivities();
     } finally {
       setDeletingId(null);
     }
   };
+
+
 
   const handleFollow = async () => {
     if (!user || loadingFollow || !currentUser) return;
