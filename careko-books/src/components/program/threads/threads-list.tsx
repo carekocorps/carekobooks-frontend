@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
 import { useThreads } from "@/hooks/useThreads";
-import ThreadPreview from "./thread-preview";
+import ThreadItem from "./thread-item";
 
 interface Props {
   bookId: number;
@@ -68,9 +68,13 @@ export function ThreadList({ bookId }: Props) {
         };
 
         return (
-          <ThreadPreview
+          <ThreadItem
             key={thread.id}
             thread={thread}
+            threadState={threadState}
+            onToggleReplies={() => toggleThreadReplies(thread.id)}
+            onReplySuccess={(parentId) => handleReplySuccess(thread.id)}
+            onToggleChildReplies={(parentReplyId) => toggleReplyChildren(thread.id, parentReplyId)}
           />
         );
       })}
