@@ -14,9 +14,9 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - carekonet-nginx
+      - carekonet-proxy
     restart: unless-stopped
 
 networks:
-  carekonet-nginx:
+  carekonet-proxy:
     external: true

@@ -23,4 +23,4 @@ jobs:
           NEXT_PUBLIC_KEYCLOAK_REALM: ${{ secrets.NEXT_PUBLIC_KEYCLOAK_REALM }}
           NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID }}
         working-directory: careko-books
-        run: docker compose up -d --build --force-recreate 
+        run: docker compose -f docker-compose.staging.yml up -d --build --force-recreate 
