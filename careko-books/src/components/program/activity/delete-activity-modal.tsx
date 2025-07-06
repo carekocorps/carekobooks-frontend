@@ -15,7 +15,7 @@ import { toast } from "sonner";
 
 interface DeleteActivityModalProps {
   activityId: number;
-  onDeleted: () => Promise<void>; // Alterado para async
+  onDeleted: () => Promise<void>; 
 }
 
 export default function DeleteActivityModal({ 
@@ -28,7 +28,7 @@ export default function DeleteActivityModal({
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await onDeleted(); // Aguarda a confirmação do parent
+      await onDeleted(); 
       setIsOpen(false);
     } catch (error) {
       toast.error("Falha ao confirmar exclusão com o servidor");

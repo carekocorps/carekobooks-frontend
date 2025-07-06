@@ -1,4 +1,11 @@
+"use client";
+
 import { useState, useRef } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -6,45 +13,92 @@ import {
   DialogTitle,
   DialogFooter,
   DialogTrigger
-} from "../../ui/dialog";
-import { Button } from "../../ui/button";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { BookService } from "@/services/books.service";
-import { Input } from "../../ui/input";
-import { Textarea } from "../../ui/textarea";
-import { Label } from "../../ui/label";
-import { Separator } from "../../ui/separator";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { CalendarIcon, ImageIcon, ImagePlus, X } from "lucide-react";
 
+const bookSchema = z.object({
+  title: z.string()
+    .min(3, "O título deve ter pelo menos 3 caracteres")
+    .max(100, "O título não pode ter mais de 100 caracteres"),
+  synopsis: z.string()
+    .min(1, "A sinopse deve ter pelo menos 10 caracteres")
+    .max(1000, "A sinopse não pode ter mais de 1000 caracteres"),
+  authorName: z.string()
+    .min(1, "O nome do autor deve ter pelo menos 3 caracteres")
+    .max(120, "O nome do autor não pode ter mais de 120 caracteres"),
+  publisherName: z.string()
+    .min(2, "O nome da editora deve ter pelo menos 2 caracteres")
+    .max(120, "O nome da editora não pode ter mais de 120 caracteres"),
+  publishedAt: z.string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida. Use o formato AAAA-MM-DD"),
+  pageCount: z.number()
+    .min(1, "O livro deve ter pelo menos 1 página")
+    .max(10000, "O número máximo de páginas é 10.000"),
+  genres: z.array(z.string().min(1, "Gênero não pode ser vazio"))
+    .min(1, "Pelo menos 1 gênero é necessário"),
+});
+
+type BookFormData = z.infer<typeof bookSchema>;
+
 export default function CreateBookModal() {
+  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    title: "",
-    synopsis: "",
-    authorName: "",
-    publisherName: "",
-    publishedAt: "",
-    pageCount: 0,
-    genres: [] as string[],
-  });
   const [image, setImage] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === "pageCount" ? Number(value) : value
-    }));
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+    watch,
+  } = useForm<BookFormData>({
+    resolver: zodResolver(bookSchema),
+    defaultValues: {
+      title: "",
+      synopsis: "",
+      authorName: "",
+      publisherName: "",
+      publishedAt: "",
+      pageCount: 0,
+      genres: [],
+    }
+  });
+
+  const { mutate: createBook, isPending } = useMutation({
+    mutationFn: async (data: BookFormData) => {
+      const payload = {
+        ...data,
+        image,
+      };
+      return await BookService.createBook(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      setIsOpen(false);
+      reset();
+      setImage(null);
+      setPreviewImage(null);
+      toast.success("Livro criado com sucesso!");
+    },
+    onError: (error) => {
+      console.error("Erro ao criar livro:", error);
+      toast.error("Falha ao criar livro");
+    }
+  });
 
   const handleGenresChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      genres: e.target.value.split(",").map(g => g.trim())
-    }));
+    const genres = e.target.value.split(",").map(g => g.trim()).filter(g => g);
+    setValue("genres", genres);
   };
 
   const handleImageFile = (file: File | null) => {
@@ -73,25 +127,8 @@ export default function CreateBookModal() {
   const triggerFileSelect = () => fileInputRef.current?.click();
   const removeImage = () => { handleImageFile(null); fileInputRef.current!.value = ""; };
 
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const payload = {
-        ...formData,
-        publishedAt: formData.publishedAt || "",
-        image,
-      };
-      await BookService.createBook(payload);
-      setIsOpen(false);
-      setFormData({ title: "", synopsis: "", authorName: "", publisherName: "", publishedAt: "", pageCount: 0, genres: [] });
-      setImage(null);
-      setPreviewImage(null);
-    } catch (error) {
-      console.error("Erro ao criar livro:", error);
-    } finally {
-      setLoading(false);
-    }
+  const onSubmit = (data: BookFormData) => {
+    createBook(data);
   };
 
   return (
@@ -113,36 +150,39 @@ export default function CreateBookModal() {
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleCreate} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-5">
             <div>
               <Label htmlFor="title">Título do Livro *</Label>
               <Input
-                id="title" name="title" value={formData.title}
-                onChange={handleChange} required
+                id="title"
+                {...register("title")}
                 placeholder="Digite o título completo"
                 className="mt-1"
               />
+              {errors.title && <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>}
             </div>
 
             <div>
               <Label htmlFor="authorName">Autor *</Label>
               <Input
-                id="authorName" name="authorName" value={formData.authorName}
-                onChange={handleChange} required
+                id="authorName"
+                {...register("authorName")}
                 placeholder="Nome completo do autor"
                 className="mt-1"
               />
+              {errors.authorName && <p className="mt-1 text-sm text-red-500">{errors.authorName.message}</p>}
             </div>
 
             <div>
               <Label htmlFor="publisherName">Editora *</Label>
               <Input
-                id="publisherName" name="publisherName" value={formData.publisherName}
-                onChange={handleChange} required
+                id="publisherName"
+                {...register("publisherName")}
                 placeholder="Nome da editora"
                 className="mt-1"
               />
+              {errors.publisherName && <p className="mt-1 text-sm text-red-500">{errors.publisherName.message}</p>}
             </div>
           </div>
 
@@ -195,10 +235,12 @@ export default function CreateBookModal() {
                 <CalendarIcon className="text-primary" /> Data de Publicação *
               </Label>
               <Input
-                id="publishedAt" name="publishedAt" type="date"
-                value={formData.publishedAt} onChange={handleChange}
-                required className="mt-1"
+                id="publishedAt"
+                type="date"
+                {...register("publishedAt")}
+                className="mt-1"
               />
+              {errors.publishedAt && <p className="mt-1 text-sm text-red-500">{errors.publishedAt.message}</p>}
             </div>
           </div>
 
@@ -207,20 +249,24 @@ export default function CreateBookModal() {
               <div>
                 <Label htmlFor="pageCount">Número de Páginas *</Label>
                 <Input
-                  id="pageCount" name="pageCount" type="number"
-                  min={1} value={formData.pageCount.toString()}
-                  onChange={handleChange} required
+                  id="pageCount"
+                  type="number"
+                  min={1}
+                  {...register("pageCount", { valueAsNumber: true })}
                   className="mt-1"
                 />
+                {errors.pageCount && <p className="mt-1 text-sm text-red-500">{errors.pageCount.message}</p>}
               </div>
               <div>
                 <Label htmlFor="genres">Gêneros</Label>
                 <Input
-                  id="genres" value={formData.genres.join(", ")}
+                  id="genres"
                   onChange={handleGenresChange}
                   placeholder="Ex: Ficção, Romance"
                   className="mt-1"
+                  defaultValue={watch("genres")?.join(", ")}
                 />
+                {errors.genres && <p className="mt-1 text-sm text-red-500">{errors.genres.message}</p>}
                 <p className="mt-1 text-xs text-zinc-500">Max. 3 gêneros</p>
               </div>
             </div>
@@ -229,22 +275,24 @@ export default function CreateBookModal() {
           <div className="lg:col-span-2">
             <Label htmlFor="synopsis">Sinopse *</Label>
             <Textarea
-              id="synopsis" name="synopsis" rows={5}
-              value={formData.synopsis} onChange={handleChange}
+              id="synopsis"
+              rows={5}
+              {...register("synopsis")}
               placeholder="Descreva o enredo em até 500 caracteres"
-              required className="mt-1"
+              className="mt-1"
             />
+            {errors.synopsis && <p className="mt-1 text-sm text-red-500">{errors.synopsis.message}</p>}
           </div>
         </form>
 
-        <Separator />
+       <Separator />
 
         <DialogFooter className="flex justify-end space-x-3">
-          <Button variant="outline" onClick={() => setIsOpen(false)} disabled={loading}>
+          <Button variant="outline" onClick={() => setIsOpen(false)} disabled={isPending}>
             Cancelar
           </Button>
-          <Button onClick={(e) => handleCreate(e as any)} disabled={loading}>
-            {loading ? "Salvando..." : "Salvar Livro"}
+          <Button type="submit" onClick={handleSubmit(onSubmit)} disabled={isPending}>
+            {isPending ? "Salvando..." : "Salvar Livro"}
           </Button>
         </DialogFooter>
       </DialogContent>

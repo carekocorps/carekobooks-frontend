@@ -21,8 +21,10 @@ import { BookService } from "@/services/books.service";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Books() {
+  const queryClient = useQueryClient();
   const {
     books,
     loading,
@@ -61,6 +63,7 @@ export default function Books() {
   const handleClearCache = async () => {
     try {
       await BookService.clearBookCache();
+      queryClient.invalidateQueries({ queryKey: ['books'] });
       toast.success("Cache limpo com sucesso!");
     } catch (error) {
       console.error("Erro ao limpar cache:", error);
@@ -69,10 +72,8 @@ export default function Books() {
   };
 
   return (
-    
     <main className="container mx-auto px-4 py-8 space-y-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <header className="space-y-6">
-        {/* Título e ações */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
@@ -127,7 +128,6 @@ export default function Books() {
           </div>
         </div>
 
-        {/* Resumo e Filtros Ativos */}
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <span className="bg-gray-100 dark:bg-gray-700 dark:text-gray-100 px-3 py-1 rounded-full">
             {totalElements} {totalElements === 1 ? "livro" : "livros"}
@@ -139,7 +139,6 @@ export default function Books() {
           )}
         </div>
 
-        {/* Campo de busca */}
         <div className="relative w-full max-w-lg">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
           <Input
@@ -159,7 +158,6 @@ export default function Books() {
         </div>
       </header>
 
-      {/* Seção de Livros */}
       <section aria-live="polite" aria-busy={loading}>
         {loading ? (
           <CarouselBooks
@@ -188,7 +186,6 @@ export default function Books() {
         )}
       </section>
 
-      {/* Paginação */}
       {totalPages > 1 && (
         <nav
           aria-label="Paginação"

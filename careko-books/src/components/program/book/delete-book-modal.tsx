@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { Button } from "../../ui/button";
 import {
@@ -14,9 +15,14 @@ import { BookService } from "@/services/books.service";
 interface DeleteBookModalProps {
   bookId: number;
   onDeleted?: () => void;
+  onDeleteBook?: (bookId: number) => void;
 }
 
-export default function DeleteBookModal({ bookId, onDeleted }: DeleteBookModalProps) {
+export default function DeleteBookModal({ 
+  bookId, 
+  onDeleted,
+  onDeleteBook 
+}: DeleteBookModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -25,6 +31,9 @@ export default function DeleteBookModal({ bookId, onDeleted }: DeleteBookModalPr
       setIsDeleting(true);
       await BookService.deleteBook(bookId);
       setIsOpen(false);
+      
+      if (onDeleteBook) onDeleteBook(bookId);
+      
       if (onDeleted) onDeleted();
     } catch (error) {
       console.error("Erro ao excluir o livro:", error);

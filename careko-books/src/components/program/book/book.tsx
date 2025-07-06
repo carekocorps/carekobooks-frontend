@@ -13,9 +13,10 @@ interface BookProps {
   isAdmin?: boolean;
   isProgress?: boolean;
   score?: number;
+  onDelete?: (bookId: number) => void;
 }
 
-export default function Book({ bookItem, isAdmin = false, isProgress = false, score }: BookProps) {
+export default function Book({ bookItem, isAdmin = false, isProgress = false, score, onDelete }: BookProps) {
   const content = (
     <div
       className={`
@@ -51,7 +52,7 @@ export default function Book({ bookItem, isAdmin = false, isProgress = false, sc
       {isAdmin && (
         <div className="flex gap-2 justify-center items-center">
           <UpdateBookModal id={bookItem.id} />
-          <DeleteBookModal bookId={bookItem.id} />
+          <DeleteBookModal bookId={bookItem.id} onDeleteBook={onDelete} />
         </div>
       )}
     </div>

@@ -26,9 +26,10 @@ import { Textarea } from "@/components/ui/textarea";
 
 interface Props {
   bookId: number;
+  onUpdate?: (review: BookReview | null) => void; 
 }
 
-export function ReviewActions({ bookId }: Props) {
+export function ReviewActions({ bookId, onUpdate }: Props) {
   const router = useRouter();
   const { user } = useCurrentUser();
   const [existingReview, setExistingReview] = useState<BookReview | null>(null);
@@ -111,16 +112,19 @@ export function ReviewActions({ bookId }: Props) {
         bookId,
       };
 
+      let result: BookReview;
+
       if (existingReview) {
-        await ReviewService.updateReview(existingReview.id, submissionData as UpdateBookReview);
+        result = await ReviewService.updateReview(existingReview.id, submissionData as UpdateBookReview);
         toast.success("Revisão atualizada com sucesso!");
       } else {
-        await ReviewService.createReview(submissionData as CreateBookReview);
+        result = await ReviewService.createReview(submissionData as CreateBookReview);
         toast.success("Revisão criada com sucesso!");
       }
 
+      setExistingReview(result);
+      onUpdate?.(result);
       setIsModalOpen(false);
-      router.refresh();
     } catch (err) {
       console.error("Erro ao salvar revisão", err);
       toast.error("Ocorreu um erro ao salvar a revisão");
@@ -136,8 +140,9 @@ export function ReviewActions({ bookId }: Props) {
       setIsSubmitting(true);
       await ReviewService.deleteReview(existingReview.id);
       toast.success("Revisão excluída com sucesso!");
+      setExistingReview(null);
+      onUpdate?.(null); 
       setIsModalOpen(false);
-      router.refresh();
     } catch (err) {
       console.error("Erro ao excluir revisão", err);
       toast.error("Ocorreu um erro ao excluir a revisão");
