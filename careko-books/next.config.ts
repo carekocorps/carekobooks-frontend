@@ -5,7 +5,7 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: process.env.NEXT_PUBLIC_S3_HOSTNAME,
-        pathname: "/images/**",
+        pathname: "/s3/images/**",
       },
     ],
   },
