@@ -13,4 +13,10 @@ services:
     container_name: carekobooks-frontend
     ports:
       - "3000:3000"
+    networks:
+      - carekonet-nginx
     restart: unless-stopped
+
+networks:
+  carekonet-nginx:
+    external: true
