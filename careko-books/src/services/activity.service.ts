@@ -4,12 +4,12 @@ import api from "./api";
 export const ActivityService = {
 
   deleteActivity: async (id: number) => {
-      return api.delete(`/api/v1/books/activities/${id}`);
+      return api.delete(`/v1/books/activities/${id}`);
   },
 
   async getActivities(params: ActivityFilterParams) {
     try {
-      const response = await api.get("/api/v1/books/activities", { 
+      const response = await api.get("/v1/books/activities", { 
         params: {
           ...params,
           orderBy: params.orderBy || 'createdAt',
@@ -25,7 +25,7 @@ export const ActivityService = {
 
   async getFollowedFeedActivities(params: ActivityFilterParams) {
     try {
-      const response = await api.get("/api/v1/books/activities/social/feed", { 
+      const response = await api.get("/v1/books/activities/social/feed", { 
         params: {
           ...params,
           orderBy: 'createdAt',

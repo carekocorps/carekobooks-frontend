@@ -25,7 +25,7 @@ export const ProgressService = {
       Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
     ) as Partial<ProgressFilters>;
 
-    const response = await api.get<ProgressResponse>("/api/v1/books/progresses", {
+    const response = await api.get<ProgressResponse>("/v1/books/progresses", {
       params: {
         pageNumber: page - 1,
         pageSize: size,
@@ -39,32 +39,32 @@ export const ProgressService = {
   },
 
   createProgress: async (data: CreateBookProgress) => {
-    const response = await api.post<BookProgress>("/api/v1/books/progresses", data);
+    const response = await api.post<BookProgress>("/v1/books/progresses", data);
     return response.data;
   },
 
    updateProgress: async (id: number, data: UpdateBookProgress) => {
-    const res = await api.put<BookProgress>(`/api/v1/books/progresses/${id}`, data);
+    const res = await api.put<BookProgress>(`/v1/books/progresses/${id}`, data);
     return res.data;
   },
 
   deleteProgress: async (id: number) => {
-    const res = await api.delete(`/api/v1/books/progresses/${id}`);
+    const res = await api.delete(`/v1/books/progresses/${id}`);
     return res.data;
   },
 
   favorite: async (id: number) => {
-    const res = await api.post<BookProgress>(`/api/v1/books/progresses/${id}/favorites`);
+    const res = await api.post<BookProgress>(`/v1/books/progresses/${id}/favorites`);
     return res.data;
   },
 
   unfavorite: async (id: number) => {
-    const res = await api.delete<BookProgress>(`/api/v1/books/progresses/${id}/favorites`);
+    const res = await api.delete<BookProgress>(`/v1/books/progresses/${id}/favorites`);
     return res.data;
   },
 
   getProgressById: async (id: number) => {
-    const res = await api.get<BookProgress>(`/api/v1/books/progresses/${id}`);
+    const res = await api.get<BookProgress>(`/v1/books/progresses/${id}`);
     return res.data;
   },
 

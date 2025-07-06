@@ -25,7 +25,7 @@ export const UserSocialService = {
       isAscendingOrder = true,
     } = params;
 
-    return api.get(`/api/v1/users/${username}/social/followers`, {
+    return api.get(`/v1/users/${username}/social/followers`, {
       params: {
         targetUsername,
         targetDisplayName,
@@ -63,7 +63,7 @@ export const UserSocialService = {
       isAscendingOrder = true,
     } = params;
 
-    return api.get(`/api/v1/users/${username}/social/following`, {
+    return api.get(`/v1/users/${username}/social/following`, {
       params: {
         targetUsername,
         targetDisplayName,
@@ -78,10 +78,10 @@ export const UserSocialService = {
   },
 
   followUser: async (username: string, targetUsername: string) => {
-    return api.post(`/api/v1/users/${username}/social/following/${targetUsername}`);
+    return api.post(`/v1/users/${username}/social/following/${targetUsername}`);
   },
 
   unfollowUser: async (username: string, targetUsername: string) => {
-    return api.delete(`/api/v1/users/${username}/social/following/${targetUsername}`);
+    return api.delete(`/v1/users/${username}/social/following/${targetUsername}`);
   },
 };

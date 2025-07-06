@@ -26,7 +26,7 @@ export const BookService = {
       Object.entries(filters).filter(([value]) => value !== undefined && value !== '')
     ) as Partial<BookFilters>;
 
-    return api.get("/api/v1/books", {
+    return api.get("/v1/books", {
       params: {
         title,
         pageNumber: page - 1,
@@ -39,11 +39,11 @@ export const BookService = {
   },
 
   getBookById: async (id: number) => {
-    return api.get(`/api/v1/books/${id}`);
+    return api.get(`/v1/books/${id}`);
   },
 
   deleteBook: async (id: number) => {
-    return api.delete(`/api/v1/books/${id}`);
+    return api.delete(`/v1/books/${id}`);
   },
 
   createBook: async (bookData: {
@@ -77,7 +77,7 @@ export const BookService = {
       }
       formData.append("image", bookData.image, bookData.image.name);
     }
-    return api.post("/api/v1/books", formData, {
+    return api.post("/v1/books", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -122,7 +122,7 @@ export const BookService = {
       formData.append("image", data.image, data.image.name);
     }
 
-    const response = await api.put(`/api/v1/books/${id}`, formData, {
+    const response = await api.put(`/v1/books/${id}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -131,10 +131,10 @@ export const BookService = {
   },
 
   clearBookCache: async () => {
-    return api.delete("/api/v1/books/cache");
+    return api.delete("/v1/books/cache");
   },
 
   assignGenre: async (id: number, genreName: string) => {
-    return api.post(`/api/v1/books/${id}/genres/${genreName}`);
+    return api.post(`/v1/books/${id}/genres/${genreName}`);
   }
 };

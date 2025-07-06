@@ -3,7 +3,7 @@ import api from "./api";
 
 export const ReviewService = {
   createReview: async (data: CreateBookReview) => {
-    const res = await api.post<BookReview>("/api/v1/books/reviews", data);
+    const res = await api.post<BookReview>("/v1/books/reviews", data);
     return res.data;
   },
 
@@ -20,22 +20,22 @@ export const ReviewService = {
       content: BookReview[];
       totalPages: number;
       totalElements: number;
-    }>("/api/v1/books/reviews", { params });
+    }>("/v1/books/reviews", { params });
     return res.data.content;
   },
 
   updateReview: async (id: number, data: UpdateBookReview) => {
-    const res = await api.put<BookReview>(`/api/v1/books/reviews/${id}`, data);
+    const res = await api.put<BookReview>(`/v1/books/reviews/${id}`, data);
     return res.data;
   },
 
   deleteReview: async (id: number) => {
-    const res = await api.delete(`/api/v1/books/reviews/${id}`);
+    const res = await api.delete(`/v1/books/reviews/${id}`);
     return res.data;
   },
 
   getReviewById: async (id: number) => {
-    const res = await api.get<BookReview>(`/api/v1/books/reviews/${id}`);
+    const res = await api.get<BookReview>(`/v1/books/reviews/${id}`);
     return res.data;
   },
 

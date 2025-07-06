@@ -13,7 +13,7 @@ export const UserService = {
   getUsers: async (page = 1, size = 10, username = '', orderBy = 'username',
     isAscending = true
 ) => {
-    return api.get("/api/v1/users", {
+    return api.get("/v1/users", {
       params: {
         username,
         pageNumber: page - 1,
@@ -39,14 +39,14 @@ export const UserService = {
       }
       formData.append("avatar", avatar, avatar.name);
     }
-    const response = await api.post("/api/v1/users", formData, {
+    const response = await api.post("/v1/users", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
   },
 
   getUserByUsername: async (username: string): Promise<UserType> => {
-    const response = await api.get(`/api/v1/users/${username}`);
+    const response = await api.get(`/v1/users/${username}`);
     return response.data;
   },
 
@@ -75,7 +75,7 @@ export const UserService = {
       }
       formData.append("image", data.image, data.image.name);
     } 
-    const response = await api.put(`/api/v1/users/${username}`, formData, {
+    const response = await api.put(`/v1/users/${username}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

@@ -3,7 +3,7 @@ import api from "./api";
 
 export const ThreadService = {
   createThread: async (data: CreateThread) => {
-    const res = await api.post<Thread>("/api/v1/books/threads", data);
+    const res = await api.post<Thread>("/v1/books/threads", data);
     return res.data;
   },
 
@@ -20,27 +20,27 @@ export const ThreadService = {
       content: Thread[];
       totalPages: number;
       totalElements: number;
-    }>("/api/v1/books/threads", { params });
+    }>("/v1/books/threads", { params });
     return res.data.content;
   },
 
   updateThread: async (id: number, data: UpdateThread) => {
-    const res = await api.put<Thread>(`/api/v1/books/threads/${id}`, data);
+    const res = await api.put<Thread>(`/v1/books/threads/${id}`, data);
     return res.data;
   },
 
   deleteThread: async (id: number) => {
-    const res = await api.delete(`/api/v1/books/threads/${id}`);
+    const res = await api.delete(`/v1/books/threads/${id}`);
     return res.data;
   },
 
   getThreadById: async (id: number) => {
-    const res = await api.get<Thread>(`/api/v1/books/threads/${id}`);
+    const res = await api.get<Thread>(`/v1/books/threads/${id}`);
     return res.data;
   },
 
   createReply: async (data: CreateThreadReply) => {
-    const res = await api.post<ThreadReply>("/api/v1/books/threads/replies", data);
+    const res = await api.post<ThreadReply>("/v1/books/threads/replies", data);
     return res.data;
   },
 
@@ -58,22 +58,22 @@ export const ThreadService = {
       content: ThreadReply[];
       totalPages: number;
       totalElements: number;
-    }>("/api/v1/books/threads/replies", { params });
+    }>("/v1/books/threads/replies", { params });
     return res.data.content;
   },
 
   updateReply: async (id: number, data: UpdateThreadReply) => {
-    const res = await api.put<ThreadReply>(`/api/v1/books/threads/replies/${id}`, data);
+    const res = await api.put<ThreadReply>(`/v1/books/threads/replies/${id}`, data);
     return res.data;
   },
 
   deleteReply: async (id: number) => {
-    const res = await api.delete(`/api/v1/books/threads/replies/${id}`);
+    const res = await api.delete(`/v1/books/threads/replies/${id}`);
     return res.data;
   },
 
   createChildReply: async (parentId: number, data: CreateThreadReply) => {
-    const res = await api.post<ThreadReply>(`/api/v1/books/threads/replies/${parentId}/children`, data);
+    const res = await api.post<ThreadReply>(`/v1/books/threads/replies/${parentId}/children`, data);
     return res.data;
   },
 
@@ -82,7 +82,7 @@ export const ThreadService = {
       content: ThreadReply[];
       totalPages: number;
       totalElements: number;
-    }>("/api/v1/books/threads/replies", {
+    }>("/v1/books/threads/replies", {
       params: {
         parentId,
         pageSize: 100,
@@ -96,7 +96,7 @@ export const ThreadService = {
     try {
       const res = await api.get<{
         totalElements: number;
-      }>("/api/v1/books/threads/replies", {
+      }>("/v1/books/threads/replies", {
         params: {
           parentId: replyId,
           pageSize: 0
