@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { use, useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { BookService } from "@/services/books.service";
@@ -15,8 +15,13 @@ import { ReviewList } from "@/components/program/review/reviews-list";
 import { GenreType } from "@/types/genre";
 import FavoriteButton from "@/components/program/progresses/favorite-button";
 
-export default function BookDetailPage({ params }: any) {
-  const bookId = Number(params.id);
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export default function BookDetailPage({ params }: Props) {
+  const { id } = use(params);
+  const bookId = Number(id);
   const [bookData, setBookData] = useState<any>(null);
   const [refreshReviews, setRefreshReviews] = useState(0);
 
@@ -44,7 +49,7 @@ export default function BookDetailPage({ params }: any) {
         <div className="max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-2xl dark:shadow-black/30 p-6 md:p-10 grid gap-10 lg:grid-cols-[260px_1fr]">
           <div className="flex justify-center lg:justify-start">
             <Image
-                src={bookData.image.url || "/placeholder.png"}
+                src={bookData.image?.url || "/placeholder.png"}
                 alt={bookData.title}
                 width={260}
                 height={380}
@@ -76,14 +81,19 @@ export default function BookDetailPage({ params }: any) {
               </span>
                 {bookData.genres?.length > 0 && (
                     <span className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 px-4 py-1 rounded-full font-medium shadow-sm">
-                  Gêneros: {bookData.genres.map((genre: GenreType) => genre.displayName).join(", ")}
+                  Gêneros: {bookData.genres.map((g: GenreType) => g.displayName).join(", ")}
                 </span>
                 )}
               </div>
 
-              <p className="text-gray-800 dark:text-gray-200 text-justify leading-relaxed text-[1.05rem] break-words">
-                {bookData.synopsis}
-              </p>
+              {/* 🔍 Corrige exibição da sinopse */}
+              {bookData.synopsis ? (
+                  <p className="text-gray-800 dark:text-gray-200 text-justify leading-relaxed text-[1.05rem] break-words">
+                    {bookData.synopsis}
+                  </p>
+              ) : (
+                  <p className="italic text-gray-500 dark:text-gray-400">Sinopse indisponível.</p>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 mt-6 items-center">
