@@ -21,9 +21,10 @@ import { Textarea } from "@/components/ui/textarea";
 
 interface Props {
   bookId: number;
+  onUpdate?: () => void;
 }
 
-export function ThreadActions({ bookId }: Props) {
+export function ThreadActions({ bookId, onUpdate }: Props) {
   const router = useRouter();
   const { user } = useCurrentUser();
   const [existingThread, setExistingThread] = useState<Thread | null>(null);
@@ -40,7 +41,7 @@ export function ThreadActions({ bookId }: Props) {
   useEffect(() => {
     const fetchThread = async () => {
       if (!user?.username) return;
-      
+
       try {
         setIsLoading(true);
         const threads = await ThreadService.searchThreads({
@@ -48,7 +49,7 @@ export function ThreadActions({ bookId }: Props) {
           bookId,
           pageSize: 1,
         });
-        
+
         if (threads.length > 0) {
           setExistingThread(threads[0]);
           setFormData({
@@ -80,23 +81,23 @@ export function ThreadActions({ bookId }: Props) {
   }, [user, bookId]);
 
   const handleInputChange = (field: keyof typeof formData, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user?.username) {
       toast.error("Usuário não autenticado");
       return;
     }
-    
+
     try {
       setIsSubmitting(true);
-      
+
       const submissionData = {
         ...formData,
         username: user.username,
@@ -105,19 +106,17 @@ export function ThreadActions({ bookId }: Props) {
 
       if (existingThread) {
         await ThreadService.updateThread(
-          existingThread.id, 
-          submissionData as UpdateThread
+            existingThread.id,
+            submissionData as UpdateThread
         );
         toast.success("Thread atualizado com sucesso!");
       } else {
-        await ThreadService.createThread(
-          submissionData as CreateThread
-        );
+        await ThreadService.createThread(submissionData as CreateThread);
         toast.success("Thread criado com sucesso!");
       }
-      
+
+      onUpdate?.(); // Atualiza lista
       setIsModalOpen(false);
-      router.refresh();
     } catch (err) {
       console.error("Erro ao salvar thread", err);
       toast.error("Ocorreu um erro ao salvar o thread");
@@ -128,13 +127,13 @@ export function ThreadActions({ bookId }: Props) {
 
   const handleDelete = async () => {
     if (!existingThread?.id) return;
-    
+
     try {
       setIsSubmitting(true);
       await ThreadService.deleteThread(existingThread.id);
       toast.success("Thread excluído com sucesso!");
+      onUpdate?.(); // Atualiza lista
       setIsModalOpen(false);
-      router.refresh();
     } catch (err) {
       console.error("Erro ao excluir thread", err);
       toast.error("Ocorreu um erro ao excluir o thread");
@@ -146,91 +145,86 @@ export function ThreadActions({ bookId }: Props) {
   if (!user || isLoading) return null;
 
   return (
-    <div className="mt-4">
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogTrigger asChild>
-          <Button className="w-full py-5 text-base rounded-xl">
-            {existingThread ? (
-              <div className="flex items-center gap-2">
-                <Pencil className="w-4 h-4" />
-                Editar Thread
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Plus className="w-4 h-4" />
-                Criar Thread
-              </div>
-            )}
-          </Button>
-        </DialogTrigger>
-        
-        <DialogContent 
-          className="sm:max-w-2xl"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          onCloseAutoFocus={(e) => e.preventDefault()}
-        >
-          <DialogHeader>
-            <DialogTitle>
-              {existingThread ? "Editar Thread" : "Criar Thread"}
-            </DialogTitle>
-          </DialogHeader>
-          
-          <form onSubmit={handleSubmit}>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Título</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => handleInputChange("title", e.target.value)}
-                  required
-                />
+      <div className="mt-4">
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogTrigger asChild>
+            <Button className="w-full py-5 text-base rounded-xl">
+              {existingThread ? (
+                  <div className="flex items-center gap-2">
+                    <Pencil className="w-4 h-4" />
+                    Editar Thread
+                  </div>
+              ) : (
+                  <div className="flex items-center gap-2">
+                    <Plus className="w-4 h-4" />
+                    Criar Thread
+                  </div>
+              )}
+            </Button>
+          </DialogTrigger>
+
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>
+                {existingThread ? "Editar Thread" : "Criar Thread"}
+              </DialogTitle>
+            </DialogHeader>
+
+            <form onSubmit={handleSubmit}>
+              <div className="grid gap-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Título</Label>
+                  <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => handleInputChange("title", e.target.value)}
+                      required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="description">Descrição</Label>
+                  <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) =>
+                          handleInputChange("description", e.target.value)
+                      }
+                      rows={6}
+                      required
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Descrição</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange("description", e.target.value)}
-                  rows={6}
-                  required
-                />
+              <div className="flex justify-between">
+                {existingThread && (
+                    <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={handleDelete}
+                        disabled={isSubmitting}
+                    >
+                      Excluir Thread
+                    </Button>
+                )}
+
+                <div className="flex justify-end gap-2">
+                  <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsModalOpen(false)}
+                      disabled={isSubmitting}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Salvando..." : "Salvar Thread"}
+                  </Button>
+                </div>
               </div>
-            </div>
-            
-            <div className="flex justify-between">
-              {existingThread && (
-                <Button 
-                  type="button"
-                  variant="destructive" 
-                  onClick={handleDelete}
-                  disabled={isSubmitting}
-                >
-                  Excluir Thread
-                </Button>
-              )}
-              
-              <div className="flex justify-end gap-2">
-                <Button 
-                  type="button"
-                  variant="outline" 
-                  onClick={() => setIsModalOpen(false)}
-                  disabled={isSubmitting}
-                >
-                  Cancelar
-                </Button>
-                <Button 
-                  type="submit"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Salvando..." : "Salvar Thread"}
-                </Button>
-              </div>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
   );
 }
