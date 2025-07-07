@@ -39,7 +39,7 @@ export default function Book({ bookItem, isAdmin = false, isProgress = false, sc
         />
         
       {isProgress && score != null ? (
-          <div className="absolute -top-2 -right-2">
+          <div className="absolute -top-2 -left-2">
             <ScoreCircle score={score ?? 0}/>
           </div>
       ) : null}

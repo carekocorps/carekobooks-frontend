@@ -60,7 +60,7 @@ export default function FavoriteProgressButton({
       setIsFavorite(previousState);
       if (onFavoriteChange) onFavoriteChange(previousState);
       
-      toast.error("Erro ao atualizar favorito");
+      toast.warning("Crie um Progresso Primeiro!");
       console.error("Favorite error:", error);
     } finally {
       setIsSubmitting(false);

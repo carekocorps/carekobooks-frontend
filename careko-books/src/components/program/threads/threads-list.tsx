@@ -64,7 +64,6 @@ export function ThreadList({ bookId }: Props) {
 
     return (
         <div className="space-y-8">
-            {/* Botão externo para criar/editar thread */}
             <ThreadActions bookId={bookId} onUpdate={refetch} />
 
             {threads.map((thread) => {

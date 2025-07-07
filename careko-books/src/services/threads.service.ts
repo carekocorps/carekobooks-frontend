@@ -1,4 +1,11 @@
-import { Thread, CreateThread, UpdateThread, ThreadReply, CreateThreadReply, UpdateThreadReply } from "@/types/thread";
+import {
+  Thread,
+  CreateThread,
+  UpdateThread,
+  ThreadReply,
+  CreateThreadReply,
+  UpdateThreadReply
+} from "@/types/thread";
 import api from "./api";
 
 export const ThreadService = {
@@ -44,24 +51,6 @@ export const ThreadService = {
     return res.data;
   },
 
-  searchReplies: async (params: {
-    parentId?: number;
-    username?: string;
-    threadId?: number;
-    bookId?: number;
-    pageSize?: number;
-    pageNumber?: number;
-    orderBy?: string;
-    isAscendingOrder?: boolean;
-  }) => {
-    const res = await api.get<{
-      content: ThreadReply[];
-      totalPages: number;
-      totalElements: number;
-    }>("/v1/books/threads/replies", { params });
-    return res.data.content;
-  },
-
   updateReply: async (id: number, data: UpdateThreadReply) => {
     const res = await api.put<ThreadReply>(`/v1/books/threads/replies/${id}`, data);
     return res.data;
@@ -77,7 +66,26 @@ export const ThreadService = {
     return res.data;
   },
 
-  getFirstLevelReplies: async ( parentId?: number) => {
+  getRepliesByThreadId: async (threadId: number, bookId: number) => {
+    console.log("Buscando replies da thread:", { threadId, bookId });
+    const res = await api.get<{
+      content: ThreadReply[];
+      totalPages: number;
+      totalElements: number;
+    }>("/v1/books/threads/replies", {
+      params: {
+        threadId,
+        bookId,
+        parentId: null,
+        pageSize: 100,
+        sort: "createdAt,asc"
+      }
+    });
+    console.log("Replies recebidas:", res.data.content);
+    return res.data.content;
+  },
+
+  getRepliesByParentId: async (parentId: number) => {
     const res = await api.get<{
       content: ThreadReply[];
       totalPages: number;

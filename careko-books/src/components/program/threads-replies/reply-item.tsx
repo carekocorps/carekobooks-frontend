@@ -52,12 +52,12 @@ export function ReplyItem({
             </p>
           </div>
         </div>
-        
+
         <p className="text-gray-700 dark:text-gray-200 whitespace-pre-line">{content}</p>
-        
+
         <div className="mt-2 flex justify-between items-center">
           <div>
-            {(hasChildren || reply.isContainingChildren) && !isExpanded && (
+            {hasChildren && !isExpanded && (
               <Button 
                 variant="outline"
                 size="sm"
@@ -68,7 +68,7 @@ export function ReplyItem({
               </Button>
             )}
           </div>
-          
+
           <ThreadReplyActions 
             threadId={threadId} 
             parentId={reply.id} 
@@ -78,17 +78,17 @@ export function ReplyItem({
       </div>
 
       {isExpanded && childrenReplies.length > 0 && (
-        <div className="mt-2 ml-6">
+        <div className="mt-2">
           {childrenReplies.map(childReply => (
-            <ReplyItem 
+            <ReplyItem
               key={childReply.id}
               reply={childReply}
               threadId={threadId}
               depth={depth + 1}
-              childrenReplies={[]} 
-              hasChildren={childReply.isContainingChildren}
-              isExpanded={false}
-              onToggleChildren={() => {}} 
+              childrenReplies={[]} // será sobrescrito pelo componente pai
+              hasChildren={false}   // idem
+              isExpanded={false}    // idem
+              onToggleChildren={() => {}} // idem
               onReplySuccess={onReplySuccess}
             />
           ))}

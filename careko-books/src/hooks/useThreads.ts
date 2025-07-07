@@ -7,6 +7,7 @@ export function useThreads(bookId: number) {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [threadsState, setThreadsState] = useState<
     Record<number, {
       expanded: boolean;
@@ -26,9 +27,9 @@ export function useThreads(bookId: number) {
         bookId,
         pageSize: 20
       });
-      
+
       setThreads(threadData);
-      
+
       const initialState: typeof threadsState = {};
       threadData.forEach(thread => {
         initialState[thread.id] = {
@@ -53,7 +54,7 @@ export function useThreads(bookId: number) {
   const toggleThreadReplies = useCallback(async (threadId: number) => {
     const currentState = threadsState[threadId];
     const isExpanded = currentState?.expanded;
-    
+
     if (isExpanded) {
       setThreadsState(prev => ({
         ...prev,
@@ -64,8 +65,8 @@ export function useThreads(bookId: number) {
       }));
     } else {
       try {
-        const replies = await ThreadService.getFirstLevelReplies(threadId);
-        
+        const replies = await ThreadService.getRepliesByThreadId(threadId, bookId);
+
         setThreadsState(prev => ({
           ...prev,
           [threadId]: {
@@ -79,13 +80,13 @@ export function useThreads(bookId: number) {
         toast.error("Falha ao carregar respostas");
       }
     }
-  }, [threadsState]);
+  }, [threadsState, bookId]);
 
   const toggleReplyChildren = useCallback(async (threadId: number, parentReplyId: number) => {
     const currentThreadState = threadsState[threadId];
     const currentChildrenState = currentThreadState?.childrenMap[parentReplyId];
     const isExpanded = currentChildrenState?.replies.length > 0;
-    
+
     if (isExpanded) {
       setThreadsState(prev => ({
         ...prev,
@@ -102,9 +103,9 @@ export function useThreads(bookId: number) {
       }));
     } else {
       try {
-        const children = await ThreadService.getFirstLevelReplies(threadId);
+        const children = await ThreadService.getRepliesByParentId(parentReplyId);
         const hasMore = await ThreadService.hasChildReplies(parentReplyId);
-        
+
         setThreadsState(prev => ({
           ...prev,
           [threadId]: {
@@ -126,14 +127,13 @@ export function useThreads(bookId: number) {
   }, [threadsState]);
 
   const handleReplySuccess = useCallback((threadId: number) => {
-  setThreadsState(prev => {
-    const currentThread = prev[threadId] || {
-      expanded: true,
-      replies: [],
-      childrenMap: {}
-    };
-    
-    if (!threadId) {
+    setThreadsState(prev => {
+      const currentThread = prev[threadId] || {
+        expanded: true,
+        replies: [],
+        childrenMap: {}
+      };
+
       return {
         ...prev,
         [threadId]: {
@@ -141,27 +141,8 @@ export function useThreads(bookId: number) {
           replies: [...currentThread.replies]
         }
       };
-    }
-    const currentChildrenMap = currentThread.childrenMap[threadId] || {
-      replies: [],
-      hasChildren: true
-    };
-
-    return {
-      ...prev,
-      [threadId]: {
-        ...currentThread,
-        childrenMap: {
-          ...currentThread.childrenMap,
-          [threadId]: {
-            ...currentChildrenMap,
-            replies: [...currentChildrenMap.replies]
-          }
-        }
-      }
-    };
-  });
-}, []);
+    });
+  }, []);
 
   return {
     threads,
