@@ -70,7 +70,7 @@ export default function ProfileHeader({
             <div className="w-full max-w-xs">
               <Button
                 className={`w-full ${isFollowing
-                  ? 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+                  ? 'bg-gray-300 text-gray-900 hover:bg-gray-400 dark:bg-blue-800 dark:text-white dark:hover:bg-blue-700'
                   : 'bg-blue-600 hover:bg-blue-700'}`}
                 onClick={onFollowClick}
                 disabled={loadingFollow}

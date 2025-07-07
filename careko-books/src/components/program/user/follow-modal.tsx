@@ -141,9 +141,11 @@ export default function FollowModal({
                                         {!isMe && (
                                             <Button
                                                 size="sm"
-                                                className={`ml-4 ${isFollowing
-                                                    ? "bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
-                                                    : "bg-blue-600 hover:bg-blue-700 text-white"}`}
+                                                className={`ml-4 ${
+                                                    isFollowing
+                                                        ? "bg-gray-300 text-gray-900 hover:bg-gray-400 dark:bg-blue-800 dark:text-white dark:hover:bg-blue-700"
+                                                        : "bg-blue-600 hover:bg-blue-700 text-white"
+                                                }`}
                                                 disabled={loading}
                                                 onClick={() => handleFollowToggle(user.username)}
                                             >
