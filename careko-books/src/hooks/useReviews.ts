@@ -13,7 +13,7 @@ export function useReviews(bookId: number){
             setError(null);
             const reviewData = await ReviewService.searchReviews({
                 bookId,
-                pageSize: 10
+                pageSize: 20
             });
 
             setReviews(reviewData)

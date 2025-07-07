@@ -24,7 +24,7 @@ export function useThreads(bookId: number) {
       setError(null);
       const threadData = await ThreadService.searchThreads({
         bookId,
-        pageSize: 10
+        pageSize: 20
       });
       
       setThreads(threadData);
